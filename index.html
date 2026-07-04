@@ -1,0 +1,2394 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dolmenwood Calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --ink: #1a1612;
+  --ink-soft: #3a342c;
+  --ink-faded: #6b5e4e;
+  --parchment: #f1e9d8;
+  --parchment-deep: #e8dcc3;
+  --parchment-light: #f9f3e3;
+  --moss: #556b3d;
+  --moss-deep: #3e4f2c;
+  --ochre: #a87838;
+  --rust: #8a3a24;
+  --sky: #5b6e7a;
+  --shadow: rgba(26, 22, 18, 0.18);
+  --moon-new: #1a1612;
+  --moon-full: #f9f3e3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--parchment);
+  background-image:
+    radial-gradient(ellipse at 10% 5%, rgba(168,120,56,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 95%, rgba(85,107,61,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(26,22,18,0.04) 100%);
+  min-height: 100vh;
+  padding: 20px 16px 60px;
+}
+.container { max-width: 1100px; margin: 0 auto; }
+
+/* ── Header ── */
+header {
+  text-align: center;
+  padding: 30px 10px 22px;
+  border-bottom: 1px solid var(--ink-faded);
+  margin-bottom: 24px;
+  position: relative;
+}
+h1 {
+  font-family: 'IM Fell English SC', 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+header .sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink-faded);
+  margin: 4px 0 0;
+}
+
+
+
+/* ── Cards ── */
+.card {
+  background: var(--parchment-light);
+  border: 1px solid var(--ink-faded);
+  border-radius: 2px;
+  padding: 22px 26px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px var(--shadow);
+  position: relative;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(107, 94, 78, 0.2);
+  pointer-events: none;
+  border-radius: 1px;
+}
+.scene-title {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--ink-faded);
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+  color: var(--ink);
+}
+.section-title {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-faded);
+  margin: 18px 0 6px;
+  text-transform: uppercase;
+}
+label {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ink-faded);
+  display: block;
+  margin-bottom: 4px;
+}
+input[type="number"], input[type="date"] {
+  font-family: 'EB Garamond', serif;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--parchment);
+  border: 1px solid var(--ink-faded);
+  border-radius: 2px;
+  padding: 8px 10px;
+}
+input:focus { outline: none; border-color: var(--rust); }
+button.go {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--parchment-light);
+  background: var(--moss-deep);
+  border: none;
+  padding: 10px 22px;
+  cursor: pointer;
+  border-radius: 2px;
+  height: 38px;
+}
+button.go:hover { background: var(--moss); }
+button.link {
+  background: none;
+  border: none;
+  color: var(--rust);
+  font-family: 'EB Garamond', serif;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+button.link:hover { color: var(--ink); }
+
+/* Today card */
+.today-card-wrap {
+  position: relative;
+  margin-bottom: 18px;
+}
+.today-card-wrap .card {
+  margin-bottom: 0;
+}
+.today-card { text-align: center; }
+.today-date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.today-date-center {
+  flex: 1;
+  text-align: center;
+}
+
+.capture-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: var(--ink-faded);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.35;
+  transition: opacity 0.15s, color 0.15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 2;
+}
+.capture-btn:hover, .capture-btn:active {
+  opacity: 0.9;
+  color: var(--ochre);
+}
+
+
+
+
+/* Zone 1: Date */
+.today-weekday {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--ink-faded);
+  margin-bottom: 4px;
+}
+.today-bigdate {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 6vw, 56px);
+  line-height: 1.1;
+  font-weight: 500;
+  margin: 2px 0 0;
+  color: var(--ink);
+}
+.today-season {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-faded);
+  margin: 3px 0 0;
+}
+
+/* Zone 2: Special day */
+.today-special {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(107, 94, 78, 0.2);
+}
+.today-feasts {
+  font-family: 'EB Garamond', serif;
+  color: var(--rust);
+  font-size: 16px;
+  margin: 0;
+}
+.today-events {
+  font-family: 'EB Garamond', serif;
+  color: var(--moss-deep);
+  font-size: 16px;
+  margin: 4px 0 0;
+}
+.feast-detail {
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
+  color: var(--ink);
+  color: var(--ink);
+  margin: 6px auto 0;
+  max-width: 560px;
+  text-align: left;
+  line-height: 1.5;
+}
+.feast-detail strong { font-weight: 600; font-style: normal; color: var(--ink); }
+
+/* Zone 3: Weather & Unseasons */
+.today-weather-zone {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(107, 94, 78, 0.2);
+}
+.today-weather {
+  font-family: 'EB Garamond', serif;
+  font-size: 16px;
+  color: var(--ink);
+  margin: 0;
+}
+.today-weather-impacts {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.today-weather-impact {
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
+  color: var(--rust);
+}
+/* Unseasons — take over weather zone */
+.today-unseasons {
+  margin: 0;
+  padding: 0;
+}
+.unseason-block {
+  margin-bottom: 10px;
+  text-align: left;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.unseason-block:last-child { margin-bottom: 0; }
+.unseason-name {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  color: var(--moss-deep);
+  margin-bottom: 4px;
+}
+.unseason-nature {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+.unseason-effects {
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
+  color: var(--rust);
+  line-height: 1.45;
+}
+
+/* Miracle card */
+.miracle-card {
+  margin-top: 12px;
+  padding-top: 10px;
+  text-align: left;
+}
+.miracle-title {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  margin-bottom: 4px;
+  text-align: center;
+}
+.miracle-spell {
+ font-family: 'EB Garamond', serif;
+  font-size: 12px;
+  color: var(--ink);
+  color: var(--ink);
+  margin: 6px auto 0;
+  max-width: 560px;
+  text-align: left;
+  line-height: 1.5;
+}
+.miracle-page {
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
+  color: var(--ink);
+  color: var(--ink);
+  margin: 6px auto 0;
+  max-width: 560px;
+  text-align: left;
+  line-height: 1.5;
+}
+
+/* Zone 4: Reference info */
+.today-reference {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(107, 94, 78, 0.2);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px 16px;
+}
+.today-ref-item {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--ink-faded);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.today-ref-divider {
+  color: rgba(107, 94, 78, 0.3);
+  font-size: 12px;
+}
+.moon-icon {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-faded);
+  vertical-align: middle;
+}
+
+/* ── Offset row ── */
+.offset-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+  justify-content: center;
+}
+.offset-row .field { display: flex; flex-direction: column; }
+.offset-row input[type="number"] { width: 80px; }
+.offset-row input[type="date"] { width: 220px; }
+
+/* ── Month grid ── */
+.months-wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.month-card {
+  background: var(--parchment-light);
+  border: 1px solid var(--ink-faded);
+  border-radius: 2px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 2px 8px var(--shadow);
+  position: relative;
+}
+.month-card::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(107, 94, 78, 0.18);
+  pointer-events: none;
+  border-radius: 1px;
+}
+.month-name {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 20px;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  margin: 0 0 2px;
+  text-align: center;
+}
+.month-meta {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-faded);
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(107, 94, 78, 0.25);
+  padding-bottom: 8px;
+}
+.weekday-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 4px;
+}
+.weekday-header div {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ink-faded);
+  text-align: center;
+  padding-bottom: 2px;
+}
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.day-cell {
+  aspect-ratio: 1 / 1;
+  background: var(--parchment);
+  border: 1px solid rgba(107, 94, 78, 0.2);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
+  border-radius: 1px;
+  padding: 1px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.day-cell:hover {
+  background: var(--parchment-deep);
+  border-color: var(--ochre);
+}
+.day-cell .num {
+  font-weight: 600;
+  line-height: 1;
+}
+.day-cell .marker {
+  font-size: 12px;
+  color: var(--rust);
+  margin-top: 1px;
+}
+.day-cell.today {
+  background: var(--ochre);
+  color: var(--parchment-light);
+  border-color: var(--ochre);
+}
+.day-cell.today:hover { background: #c08a42; }
+.day-cell.today .marker { color: var(--parchment-light); }
+
+/* Adventure range: days within an adventure span (excluding start) */
+.day-cell.adventure-range {
+  background: #e8d4a8;
+  border-color: var(--ochre);
+  color: var(--ink);
+}
+.day-cell.adventure-range:hover { background: #dcc396; }
+/* End of adventure (last day) */
+.day-cell.adventure-end {
+  background: var(--rust);
+  color: var(--parchment-light);
+  border-color: var(--rust);
+}
+.day-cell.adventure-end:hover { background: #a04930; }
+.day-cell.adventure-end.feast::after { color: var(--parchment-light); }
+/* Wysenday adventure variants */
+.wysenday-cell.adventure-range {
+  background: #e8d4a8;
+  border-color: var(--ochre);
+}
+.wysenday-cell.adventure-range:hover { background: #dcc396; }
+.wysenday-cell.adventure-end {
+  background: var(--rust);
+  color: var(--parchment-light);
+  border-color: var(--rust);
+}
+.wysenday-cell.adventure-end:hover { background: #a04930; }
+.wysenday-cell.adventure-end .wysen-num { color: var(--parchment-light); }
+.wysenday-cell.adventure-end .wysen-name { color: var(--parchment-light); }
+
+/* Unseason days — unified grey, lower priority than adventure range/end/today */
+.day-cell.unseason {
+  background: #c8c4bc;
+  border-color: #a8a49c;
+  color: var(--ink);
+}
+.day-cell.unseason:hover {
+  background: #b8b4ac;
+  border-color: #989490;
+}
+.wysenday-cell.unseason {
+  background: #c8c4bc;
+  border-color: #a8a49c;
+}
+.wysenday-cell.unseason:hover {
+  background: #b8b4ac;
+  border-color: #989490;
+}
+/* Adventure range/end/today always override unseason */
+.day-cell.today.unseason,
+.day-cell.adventure-range.unseason,
+.day-cell.adventure-end.unseason {
+  background: inherit;
+  border-color: inherit;
+  color: inherit;
+}
+
+/* Feast marker: top-right star */
+.day-cell.feast::after {
+  content: "\2726";
+  position: absolute;
+  top: 1px; right: 2px;
+  font-size: 12px;
+  color: var(--rust);
+  line-height: 1;
+}
+.day-cell.today.feast::after { color: var(--parchment-light); }
+
+/* Equinox/solstice: green bottom bar */
+.day-cell.event {
+  border-color: var(--moss);
+}
+.day-cell.event::before {
+  content: "";
+  position: absolute;
+  bottom: 1px; left: 1px; right: 1px;
+  height: 2px;
+  background: var(--moss);
+  border-radius: 1px;
+}
+
+/* ── Moon markers in day cells ── */
+.moon-marker {
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  line-height: 1;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+.moon-marker svg {
+  display: block;
+}
+/* On today cells (ochre bg), boost visibility of the full moon outline */
+.day-cell.today .moon-marker.moon-full-marker svg circle {
+  stroke: var(--parchment-deep);
+}
+
+/* Wysendays — styled like regular day cells but wider with name inline, 2-per-row */
+.wysenday-row {
+  margin-top: 2px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+}
+.wysenday-cell {
+  min-width: 0;
+  min-height: 32px;
+  background: var(--parchment);
+  border: 1px solid rgba(107, 94, 78, 0.2);
+  border-radius: 1px;
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
+  font-style: normal;
+  color: var(--ink);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 4px 8px;
+  gap: 8px;
+  line-height: 1.2;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.wysenday-cell:hover {
+  background: var(--parchment-deep);
+  border-color: var(--ochre);
+}
+.wysenday-cell .wysen-num {
+  font-family: 'EB Garamond', serif;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ink);
+  flex-shrink: 0;
+  line-height: 1;
+}
+.wysenday-cell .wysen-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.2;
+}
+.wysenday-cell.today {
+  background: var(--ochre);
+  color: var(--parchment-light);
+  border-color: var(--ochre);
+}
+.wysenday-cell.today:hover { background: #c08a42; }
+.wysenday-cell.today .wysen-num { color: var(--parchment-light); }
+.wysenday-cell.today .wysen-name { color: var(--parchment-light); }
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 14px;
+  margin-top: 0;
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
+  color: var(--ink-faded);
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-swatch {
+  width: 14px; height: 14px;
+  border: 1px solid rgba(107,94,78,0.4);
+  background: var(--parchment);
+  position: relative;
+  flex-shrink: 0;
+}
+.legend-swatch.today-sw { background: var(--ochre); border-color: var(--ochre); }
+.legend-swatch.feast-sw::after { content: "\2726"; position: absolute; top: -3px; right: 0; color: var(--rust); font-size: 12px; }
+.legend-swatch.event-sw { border-color: var(--moss); }
+.legend-swatch.event-sw::before { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--moss); }
+.legend-swatch.wysen-sw { background: var(--parchment-deep); border-color: var(--ochre); }
+.legend-swatch.adv-range-sw { background: #e8d4a8; border-color: var(--ochre); }
+.legend-swatch.adv-end-sw { background: var(--rust); border-color: var(--rust); }
+.legend-swatch.unseason-sw { background: #c8c4bc; border-color: #a8a49c; }
+/* Moon legend swatches */
+.legend-moon-icon {
+  width: 14px; height: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Year navigation ── */
+.year-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.year-display {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ink);
+  min-width: 60px;
+  text-align: center;
+}
+.year-arrow {
+  color: var(--ink-faded);
+  color: var(--ink-faded);
+  background: var(--parchment);
+  border: 1px solid var(--ink-faded);
+  border-radius: 2px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.year-arrow:hover {
+  background: var(--ochre);
+  color: var(--parchment-light);
+  border-color: var(--ochre);
+}
+
+/* ── Feast detail panel ── */
+
+
+footer {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-faded);
+  padding: 0 20px;
+  line-height: 1.6;
+}
+
+@media (max-width: 960px) and (min-width: 601px) {
+  .months-wrap { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  body { padding: 14px 10px 40px; font-size: 16px; }
+  .card { padding: 18px 16px; }
+
+  .months-wrap { grid-template-columns: 1fr; }
+  .selected-date-bar { flex-wrap: wrap; gap: 6px; }
+}
+
+/* Disable sticky hover on touch devices */
+@media (hover: none) {
+  .day-cell,
+  .wysenday-cell {
+    transition: none;
+  }
+  .day-cell:hover,
+  .day-cell.today:hover,
+  .day-cell.unseason:hover,
+  .day-cell.adventure-range:hover,
+  .day-cell.adventure-end:hover,
+  .wysenday-cell:hover,
+  .wysenday-cell.today:hover,
+  .wysenday-cell.unseason:hover,
+  .wysenday-cell.adventure-range:hover,
+  .wysenday-cell.adventure-end:hover {
+    background: unset;
+    border-color: unset;
+  }
+  .day-cell.today:hover         { background: var(--ochre); border-color: var(--ochre); }
+  .day-cell.adventure-end:hover { background: var(--rust);  border-color: var(--rust);  }
+  .wysenday-cell.today:hover    { background: var(--ochre); border-color: var(--ochre); }
+}
+
+
+
+/* ── Search results ── */
+.search-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(107,94,78,0.15);
+  font-family: 'EB Garamond', serif;
+  font-size: 16px;
+  color: var(--ink);
+  transition: background 0.1s;
+}
+.search-item:hover {
+  background: var(--parchment-deep);
+}
+.search-item:last-child { border-bottom: none; }
+.search-item .search-label {
+  font-weight: 600;
+  color: var(--ink);
+}
+.search-item .search-meta {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-faded);
+  margin-left: 8px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>Dolmenwood Calendar</h1>
+  <p class="sub">Tracking days in the Dolmenwood</p>
+</header>
+
+<!-- The "today" card -->
+<div class="today-card-wrap">
+  <div class="card today-card" id="today-card"></div>
+  <button id="capture-btn" class="capture-btn" onclick="captureTodayCard()" title="Capture" data-html2canvas-ignore="true">
+    <svg width="18" height="18" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="12.5" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 6 L9.5 3.5 H12.5 L14 6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="17" cy="9" r="1" fill="currentColor"/></svg>
+  </button>
+</div>
+
+
+<!-- Search feasts & wysendays -->
+<div class="card" id="search-card">
+  <div class="section-title">Search Feasts &amp; Wysendays</div>
+  <div style="position:relative;">
+    <input type="text" id="feast-search" placeholder="e.g. Hanglemas, St Vinicus, Vernal Equinox…" autocomplete="off"
+      style="width:100%; font-family:'EB Garamond',serif; font-size:16px; color:var(--ink); background:var(--parchment); border:1px solid var(--ink-faded); border-radius:2px; padding:10px 12px;">
+    <div id="search-results" style="display:none; position:absolute; left:0; right:0; top:100%; z-index:10; max-height:260px; overflow-y:auto; background:var(--parchment-light); border:1px solid var(--ink-faded); border-top:none; border-radius:0 0 2px 2px; box-shadow:0 4px 12px var(--shadow);"></div>
+  </div>
+</div>
+
+<!-- Adventure Calculator -->
+<div class="card" id="offset-card">
+  <div class="section-title">Adventure Calculator</div>
+  <p style="margin:0 0 14px; font-size:15px; color:var(--ink-soft);">
+    By default this calendar shows the Dolmenwood date corresponding to today's real-world date.
+    Adjust the values below to look forward or backward in time.
+  </p>
+  <form class="offset-row" onsubmit="event.preventDefault(); applyOffset(); return false;">
+    <div class="field">
+      <label>Real-World Adventure Start</label>
+      <input id="real-date" type="date">
+    </div>
+    <div class="field">
+      <label>Dolmenwood Adventure Start</label>
+      <div style="display:flex; gap:6px; align-items:flex-end;">
+        <select id="adv-dw-month" style="font-family:'EB Garamond',serif; font-size:15px; color:var(--ink); background:var(--parchment); border:1px solid var(--ink-faded); border-radius:2px; padding:7px 6px; height:36px;">
+          <option value="1">Grimvold</option>
+          <option value="2">Lymewald</option>
+          <option value="3">Haggryme</option>
+          <option value="4">Symswald</option>
+          <option value="5">Harchment</option>
+          <option value="6">Iggwyld</option>
+          <option value="7">Chysting</option>
+          <option value="8">Lillipythe</option>
+          <option value="9">Haelhold</option>
+          <option value="10">Reedwryme</option>
+          <option value="11">Obthryme</option>
+          <option value="12">Braghold</option>
+        </select>
+        <input id="adv-dw-day" type="number" min="1" max="31" value="1" style="width:56px; font-size:15px; padding:7px 6px; height:36px;">
+        <input id="adv-dw-year" type="number" value="1089" style="width:72px; font-size:15px; padding:7px 6px; height:36px;">
+      </div>
+    </div>
+    <div class="field">
+      <label>Total Days</label>
+      <input id="off-days" type="number" value="0">
+    </div>
+    <div class="field">
+      <label>&nbsp;</label>
+      <button class="go" type="submit">Calculate</button>
+    </div>
+    <div class="field">
+      <label>&nbsp;</label>
+      <button class="link" type="button" onclick="resetToToday()">Reset to today</button>
+    </div>
+  </form>
+</div>
+
+<!-- The full year -->
+<div class="card">
+  <div class="scene-title" style="display:flex; align-items:center; justify-content:space-between;">
+    <span>The Year</span>
+    <div class="year-nav">
+      <button class="go" id="toggle-full-year" onclick="toggleFullYear()" style="font-size:11px; padding:6px 14px; height:auto; margin-right:6px;">Show Full Year</button>
+      <button class="year-arrow" onclick="changeYear(-1)" title="Previous year"><svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="8,2 2,8 8,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <span class="year-display" id="year-display"></span>
+      <button class="year-arrow" onclick="changeYear(1)" title="Next year"><svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="2,2 8,8 2,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch feast-sw"></span> Feast or holiday</div>
+    <div class="legend-item"><span class="legend-swatch event-sw"></span> Solstice / equinox</div>
+    <div class="legend-item"><span class="legend-swatch unseason-sw"></span> Unseason</div>
+    <div class="legend-item">
+      <span class="legend-moon-icon">
+        <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#1a1612" stroke="#6b5e4e" stroke-width="0.8"/></svg>
+      </span>
+      New Moon
+    </div>
+    <div class="legend-item">
+      <span class="legend-moon-icon">
+        <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#f9f3e3" stroke="#6b5e4e" stroke-width="0.8"/></svg>
+      </span>
+      Full Moon
+    </div>
+  </div>
+  <div class="months-wrap" id="months-wrap"></div>
+</div>
+
+<!-- Change Calibration Date -->
+<div class="card" id="calibration-card">
+  <div class="section-title">Change Calibration Date</div>
+  <p style="margin:0 0 14px; font-size:15px; color:var(--ink-soft);">
+    Set which real-world date corresponds to which Dolmenwood date. The entire calendar recalculates from this anchor.
+  </p>
+  <div class="offset-row">
+    <div class="field">
+      <label>Real-World Date</label>
+      <input id="cal-real-date" type="date">
+    </div>
+    <div class="field">
+      <label>Dolmenwood Month</label>
+      <select id="cal-dw-month" style="font-family:'EB Garamond',serif; font-size:16px; color:var(--ink); background:var(--parchment); border:1px solid var(--ink-faded); border-radius:2px; padding:8px 10px; height:38px;">
+        <option value="1">Grimvold</option>
+        <option value="2">Lymewald</option>
+        <option value="3">Haggryme</option>
+        <option value="4">Symswald</option>
+        <option value="5">Harchment</option>
+        <option value="6">Iggwyld</option>
+        <option value="7">Chysting</option>
+        <option value="8">Lillipythe</option>
+        <option value="9">Haelhold</option>
+        <option value="10">Reedwryme</option>
+        <option value="11">Obthryme</option>
+        <option value="12">Braghold</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Day</label>
+      <input id="cal-dw-day" type="number" min="1" max="31" value="1" style="width:70px;">
+    </div>
+    <div class="field">
+      <label>Year</label>
+      <input id="cal-dw-year" type="number" value="1089" style="width:90px;">
+    </div>
+    <div class="field">
+      <label>&nbsp;</label>
+      <button class="go" type="button" onclick="applyCalibration()">Set Calibration</button>
+    </div>
+    <div class="field">
+      <label>&nbsp;</label>
+      <button class="link" type="button" onclick="resetCalibration()">Reset to Defaults</button>
+    </div>
+  </div>
+</div>
+
+
+<div style="margin-top:16px; display:flex; align-items:center; gap:8px; justify-content:center; flex-wrap:wrap;">
+  <label style="font-family:'IM Fell English SC',serif; font-size:12px; letter-spacing:0.06em; color:var(--ink-faded);">Weather Seed</label>
+  <input id="weather-seed-input" type="text" autocomplete="off" spellcheck="false"
+    style="font-family:'EB Garamond',serif; font-size:13px; color:var(--ink); background:var(--parchment); border:1px solid var(--ink-faded); border-radius:2px; padding:4px 8px; width:140px; text-align:center;"
+    placeholder="e.g. mygame2024"
+    onblur="applySeed();"
+    onkeydown="if(event.key==='Enter'){ this.blur(); }" />
+  <button onclick="confirmAndReset();" style="font-family:'IM Fell English SC',serif;font-size:12px;letter-spacing:0.06em;color:var(--ink-faded);background:transparent;border:none;cursor:pointer;text-decoration:underline;padding:4px 0;">Randomise</button>
+</div>
+<p class="disclaimer" style="margin-top:6px; text-align:center; font-family:'EB Garamond',serif; font-size:11px; color:var(--ink-faded);">Share your seed with others to give them the same weather.</p>
+
+
+<footer>
+  Built for Dolmenwood by Necrotic Gnome. This tool uses the Campaign Book, Players Book, and the Book of Hours for Dolmenwood created by Hilltown Studio. This tool was developed with the assistance of AI for HTML programming.
+</footer>
+</div>
+
+
+<script>
+'use strict';
+
+// ============================================================================
+// CALENDAR DATA
+// ============================================================================
+const WEEKDAYS = ['Colly', 'Chime', 'Hayme', 'Moot', 'Frisk', 'Eggfast', 'Sunning'];
+
+const MONTHS = [
+  { name: 'Grimvold',   season: 'The Onset of Winter',     ord: 1,  len: 30, wysendays: ['Hanglemas', "Dyboll's Day"] },
+  { name: 'Lymewald',   season: 'Deep Winter',             ord: 2,  len: 28, wysendays: [] },
+  { name: 'Haggryme',   season: 'The Fading of Winter',    ord: 3,  len: 30, wysendays: ["Yarl's Day", 'The Day of Virgins'] },
+  { name: 'Symswald',   season: 'The Onset of Spring',     ord: 4,  len: 29, wysendays: ['Hopfast'] },
+  { name: 'Harchment',  season: 'High Spring',             ord: 5,  len: 29, wysendays: ['Smithing'] },
+  { name: 'Iggwyld',    season: 'The Fading of Spring',    ord: 6,  len: 30, wysendays: ['Shortening', "Longshank's Day"] },
+  { name: 'Chysting',   season: 'The Onset of Summer',     ord: 7,  len: 31, wysendays: ['Bradging', 'Copsewallow', 'Chalice'] },
+  { name: 'Lillipythe', season: 'High Summer',             ord: 8,  len: 29, wysendays: ["Old Dobey's Day"] },
+  { name: 'Haelhold',   season: 'The Fading of Summer',    ord: 9,  len: 28, wysendays: [] },
+  { name: 'Reedwryme',  season: 'The Onset of Autumn',     ord: 10, len: 30, wysendays: ["Shub's Eve", 'Druden Day'] },
+  { name: 'Obthryme',   season: 'Deep Autumn',             ord: 11, len: 28, wysendays: [] },
+  { name: 'Braghold',   season: 'The Fading of Autumn',    ord: 12, len: 30, wysendays: ['The Day of Doors', 'Dolmenday'] },
+];
+const DAYS_PER_YEAR = MONTHS.reduce((a, m) => a + m.len, 0); // = 352
+
+// ============================================================================
+// FEASTS & OBSERVANCES
+// ============================================================================
+const FEASTS = {
+  '1:1':  { feast: 'Feast of St Vinicus, thrice hanged', note: "First day of the new year. Pluritine Observances: Giving of alms to the poor and sharing of food with mice." },
+  '1:4':  { feast: 'Feast of St Albert of the bleeding palm' },
+  '1:5':  { feast: 'Feast of St Offrid, oath-bearer' },
+  '1:9':  { feast: 'Feast of St Choad the mellifluous' },
+  '1:17': { feast: 'Feast of St Clyde the right-minded' },
+  '1:19': { feast: 'Feast of St Elsa, balm-gusher', event: 'Winter Solstice', note: "Folk Observances: Many participate in a pageant to crown the Holly Court. Popular treats include maple candies made by freezing maple sap. Folk light their hearths with kept embers from the midsummer bonfire." },
+  '1:21': { feast: 'Feast of St Baldric of the liminal eye' },
+  '1:27': { feast: 'Feast of St Cantius, God-fool' },
+  '1:29': { feast: 'Feast of St Joane the broken' },
+  '2:2':  { feast: 'Feast of St Waylord of the brook' },
+  '2:3':  { feast: 'Feast of St Gondyw, converter of kings', note: "Pluritine Observances: Blackeswell hosts the largest observance, where the people put on a pageant in which an altar-boy wrestles the king's champion to the ground, causing the king to convert to the Pluritine faith." },
+  '2:9':  { feast: 'Feast of St Calafredus the confessor' },
+  '2:15': { feast: 'Feast of St Wynne of the scar' },
+  '2:19': { feast: 'Feast of St Albrith the illuminator' },
+  '2:23': { feast: 'Feast of St Fredulus the beheaded' },
+  '2:28': { feast: 'Feast of St Eggort the troglodyte', note: "Pluritine Observances: It is custom to keep a simple beeswax candle lit through the night, from sundown on the 28th of Lymewald to sunup on the 1st of Haggryme. This is said to help guide lingering souls to the afterlife." },
+  '3:5':  { feast: 'Feast of St Clister of the four winds' },
+  '3:6':  { feast: 'Feast of St Ponch the prudent', note: "Pluritine Observances: Release of stick, bark, and leaf boats down local waterways and making food offerings to feed the lost in hopes of guiding them home." },
+  '3:11': { feast: 'Feast of St Flatius, parchment-bearer' },
+  '3:12': { feast: 'Feast of St Quister, ever-loyal', note: "Pluritine Observances: It is customary to take communion with the pure, sweet water produced by praying to St. Quister." },
+  '3:13': { feast: 'Feast of St Aeynid the impeccable' },
+  '3:18': { feast: 'Feast of St Visyg of the canker' },
+  '3:22': { feast: 'Feast of St Pannard the lithe' },
+  '3:23': { feast: 'Feast of St Simone the withered' },
+  '3:25': { feast: 'Feast of St Sortia, serpent-bane' },
+  '3:27': { feast: 'Feast of St Pastery, butter-monger', note: "Pluritine Observances: Priests and clergy visit local wells and bestow blessings on them. People slaughter blessed winter calves and use them to make mince or shrid pies." },
+  '3:28': { feast: 'Feast of St Bethany of Brackenwold' },
+  '3:29': { feast: 'Feast of St Tumbel, torch-bringer' },
+  '3:30': { feast: 'Feast of St Lillibeth of the sugared breath', note: "Pluritine Observances: Folk fashion or buy folded paper doves on which they write their afflictions. These are offered in supplication in hope that St. Lillibeth will intervene to cure them." },
+  '4:1':  { feast: 'Feast of St Gwigh the unsleeping' },
+  '4:2':  { feast: 'The Feast of Cats', note: "Folk Observances: All over Dolmenwood, the folk put on spring balls and light bonfires. They attend dressed as cats and accompany their revelry with screeching and discordant fiddle music." },
+  '4:3':  { feast: 'Feast of St Medigor, mead-fast' },
+  '4:5':  { feast: 'Feast of St Ingrid of the bludgeon' },
+  '4:7':  { feast: 'Feast of St Neblit the horrified' },
+  '4:8':  { feast: 'Feast of St Dullard the swift' },
+  '4:10': { feast: 'Feast of St Whittery of the woods', note: "Pluritine Observances: The Church appoints youth choirs to walk in procession singing hymns and holding candles to ward off evil spirits, cleansing the land of \"witches\" and \"fey\"." },
+  '4:12': { feast: 'Feast of St Pious the plump' },
+  '4:14': { feast: 'Feast of St Thorm, faith-smith', note: "Plurtine Observances: Participants throw colored powders at each other to root out witchcraft and evil magic. Card games are a popular pastime during the feast." },
+  '4:18': { feast: 'Feast of St Goodenough the hearty', note: "Pluritine Observances: Folk bring their corn dollies, saved from the previous harvest, to plow into the first furrows. In most settlements, folk build an imitation of such a dolly to burn in effigy." },
+  '4:20': { event: 'Vernal Equinox', note: "Folk Observances: Folk flock to the hillsides to watch and participate in racing cheese wheels. They cap off the day with dances and drink." },
+  '5:7':  { feast: 'Feast of St Craven the incontinent' },
+  '5:9':  { feast: 'Feast of St Rhilma of the parched lip' },
+  '5:10': { feast: 'Feast of St Talambeth the ignitor' },
+  '5:16': { feast: 'Feast of St Jorrael, God-friend', note: "Pluritine Observances: St. Jorrael is venerated with communal prayers in the settlement squares. Folk, especially youth, like to fashion simple, uniform masks which they don before committing mischievous acts in the early evening." },
+  '5:19': { feast: 'Feast of St Hoargrime the vexed' },
+  '5:22': { feast: 'Feast of St Abthius, ever-lustrous', note: "Pluritine Observances: Folk adorn their homes and churches in the radiant colors of the new blooms to ward off late frosts, then hold courtly dances in the settlement squares." },
+  '5:24': { feast: 'Feast of St Primace the obdurate' },
+  '5:26': { feast: 'Feast of St Knock the steadfast' },
+  '5:29': { feast: 'Feast of St Wilbranch of the weeping' },
+  '6:3':  { feast: 'Feast of St Gripe the forthright', note: "Pluritine Observances: It is customary for folk who have cows to choose their prized cows and crown them with a flower wreath. They lead their cows in a procession through town." },
+  '6:9':  { feast: 'Feast of St Puriphon of the wick' },
+  '6:19': { feast: 'Feast of St Hildace the hidden' },
+  '6:27': { feast: 'Feast of St Maternis the sufferer' },
+  '6:30': { feast: 'Feast of St Waylaine of the sack', note: "Pluritine Observances: The largest observance is in Prigwort. Throughout the Wood, folk enjoy a pageant wherein the eponymous saint is to be executed for treason, but is thrice spared by various contrivances." },
+  '7:6':  { feast: 'Feast of St Nuncy the wretched' },
+  '7:10': { feast: 'Feast of St Apoplect the ever-roaming' },
+  '7:16': { feast: 'Feast of St Cornice of the angels', note: "Pluritine Observances: Priests and clergy make rounds to bless the burrows of beetles and other insects. Folk compete to make intricate pastries in the shape of the beetles of the Wood." },
+  '7:18': { event: 'Summer Solstice', note: "Folk Observances: The night of the Summer Solstice is marked by a grand pageant that includes the crowning of the Oak Court, followed by courtly dances. A bonfire is the culminating event, and it is from this bonfire that folk take home an ember to keep their hearth lit through winter." },
+  '7:20': { feast: 'Feast of St Dougan the incredulous', note: "Folk of the Wood delight in competing with one another on who can get the most people to believe outlandish things. On this day, active rumours in a settlement are all peppered with untruths." },
+  '7:27': { feast: 'Feast of St Sabian the horn-bearer' },
+  '7:31': { feast: 'Feast of St Jubilant the chanter' },
+  '8:4':  { feast: 'Feast of St Foggarty of the cup', note: "Pluritine Observances: The largest observance is in the Woodcutter's Encampment, where folk mark safe paths through the woods with candles and other lights." },
+  '8:5':  { feast: 'Feast of St Keye the chronicler', note: "Pluritine Observances: It is customary for folk to hide trinkets for others to find. Around Castle Brackenwold, this is often a children's game that includes the hiding and finding of decorated eggs." },
+  '8:9':  { feast: 'Feast of St Primula the beneficent', note: "Pluritine Observances: Folk gather in the squares with their prized oxen, which bestow blessings via an \"ox kiss\" upon the day's competitors, who stage wrestling matches." },
+  '8:16': { feast: 'Feast of St Dillage the blood-bearer' },
+  '8:20': { feast: 'Feast of St Torphia of the solitudes', note: "Pluritine Observances: Folk gather at the Churches to have their harvested blueberries blessed by the clergy to remove any poisons from them." },
+  '8:25': { feast: 'Feast of St Esther of the orchard' },
+  '8:27': { feast: 'Feast of St Philodeus the mighty' },
+  '8:28': { feast: 'Feast of St Lummox, soul-sooth' },
+  '8:29': { feast: 'Feast of St Capernott the prophetess' },
+  '9:5':  { feast: 'Feast of St Willibart, balm-tears' },
+  '9:8':  { feast: 'Feast of St Sanguine, fairy-bane' },
+  '9:10': { feast: 'Feast of St Benester the right-believing', note: "Pluritine Observances: Folk spend this day fasting and invoking the names of the seventeen archangels in prayer. At sundown, they break their fast with a simple meal." },
+  '9:15': { feast: 'Feast of St Faxis the penitent', note: "Pluritine Observances: It is customary to hold parades for soldiers and militia members, past and present, who serve the Duchy as protectors." },
+  '9:25': { feast: 'Feast of St Gretchen the maiden', note: "Pluritine Observances: Folk gather to remember those soldiers who have fallen in battle. Folk Observances: Folk hold competitions to judge all manner of pickled, brewed, and fermented foods and drinks." },
+  '9:28': { feast: 'Feast of St Galaunt the wonderworker', note: "Pluritine Observances: Folk reminisce on their deeds to date and make public and private resolutions to guide them in the future." },
+  '10:1':  { feast: 'Feast of St Dextre the unbridled' },
+  '10:3':  { feast: 'Feast of St Wick the venerable', note: "Pluritine Observances: The largest observance is in Dreg. Folk gather to hear religious parables and hold contests for the best fables and morality plays." },
+  '10:4':  { feast: 'Feast of St Elephantine the scribe' },
+  '10:8':  { feast: 'Feast of St Moribund the doorkeeper' },
+  '10:13': { feast: 'Feast of St Loame the sanctimonious' },
+  '10:18': { feast: 'Feast of St Shank the eagle-eyed' },
+  '10:19': { event: 'Autumnal Equinox', note: "Folk Observances: Around the Wood, folk celebrate the autumn by carving faces into apples and hanging them at the edges of their orchards to keep pests and faeries away. Brewers bring out the first ciders of the season." },
+  '10:21': { feast: 'Feast of St Hollyhock the jubilant', note: "Pluritine Observances: It is customary for folk to reenact the saving of a falsely accused baker from the flames of an oven by St. Hollyhock. The day is also marked by the preparation of stuffed goose." },
+  '10:22': { feast: 'Feast of St Egbert the grim' },
+  '10:25': { feast: 'Feast of St Clewyd the refulgent', note: "Pluritine Observances: Clergy hold public masses to absolve the sins of the faithful. On this day, any public debt that has been outstanding for seventeen years or more is forgiven in an act of jubilee. Unicorn-effigies are burned atop bonfires and pheasants and partridges baked into spiced pies." },
+  '10:26': { feast: 'Feast of St Howarth the accursed', note: "Pluritine Observances: This is a day of mourning, fasting, and penitence. Many folk stay at home." },
+  '10:27': { feast: 'Feast of St Howdych the tower' },
+  '10:29': { feast: 'Feast of St Signis the silent', note: "Pluritine Observances: Faithful folk of the Wood observe this day in prayer and meditation, fasting and remaining silent from sunup to sundown." },
+  '10:30': { feast: 'Festival of the Green Man', note: "A relic of ancient worship in Dolmenwood. The Green Man was at one time honoured as King of the Wood. Among humans (and to a lesser extent the Breggles and Mosslings), the day commences with a hunt and culminates with feasting and revelry. Folk also hang manikins of moss and wood by their ankles around the villages." },
+  '11:7':  { feast: 'Feast of St Horace the puissant', note: "Pluritine Observances: Folk around the Wood observe this feast by gathering and stringing up mushroom \"rosaries\". Popular dishes during this time all include the various mushrooms that grow in Dolmenwood." },
+  '11:9':  { feast: 'Feast of St Hamfast, cloud-head', note: "Pluritine Observances: Folk construct, repair, and gather at wild \"churches\" made for the animals of the Wood. There they leave treats and other enticements to bring animals closer to the faith." },
+  '11:13': { feast: 'Feast of St Woad the homefast' },
+  '11:22': { feast: 'Feast of St Hodwich the unmercenary' },
+  '11:24': { feast: 'Feast of St Wort the benignant', note: "Pluritine Observances: Folk gather near local yew trees for a special sermon by their clergy. This includes a segment in which the clergy member speaks directly with the yew trees." },
+  '11:27': { feast: 'Feast of St Godfrey the chaste' },
+  '11:28': { feast: 'Feast of St Dank of the thorn', note: "Demonstrating the power of faith over serpents, it is customary for clergy to engage in public acts of snake charming." },
+  '12:9':  { feast: 'Feast of St Poltry of the wastes' },
+  '12:10': { feast: 'Feast of St Sedge the unblemished', note: "Pluritine Observances: Folk gather to reenact a pageant telling the story of St. Sedge and his victory over the spectral champion of a sorcerer king." },
+  '12:15': { feast: 'Feast of St Clyve the doleful' },
+  '12:21': { feast: 'Feast of St Gawain the goodly' },
+  '12:25': { feast: 'Feast of St Thridgold the gallant' },
+  '12:28': { feast: 'Feast of St Therese the young' },
+  '12:29': { feast: 'Feast of St Habicus the lofty' },
+  '12:30': { feast: 'Feast of St Willofrith the wide', note: "Pluritine Observances: Folk gather in the squares to hear proclaimed any updates to the laws of the Duchy. Afterward, they refresh themselves with mulled wine and cider. The Hunting of the Winter Hart. Folk Observances: It is customary for folk of the Wood to ride out into the woods at night hunting the Winter Hart, which they may do until dawn. If the Hart is caught, folk believe that winter will be banished for a year." },
+};
+
+// ============================================================================
+// MIRACLES — holy spells granted by saints on their feast days
+// Each entry: { spell, prayer, page }
+// ============================================================================
+const MIRACLES = {
+  '1:1':   { spell: 'Animal Growth', prayer: 'Mercy of St Vinicus', page: 106},
+  '1:19':  { spell: 'Communion', prayer: "St Elsa's Visitation", page: 110},
+  '2:3':   { spell: 'Bless', prayer: 'Righteousness of St Gondyw', page: 104},
+  '2:28':  { spell: 'Holy Light', prayer: 'Devotion of St Eggort', page: 107},
+  '3:6':   { spell: 'Create Food', prayer: "St Ponch's Feast", page: 110},
+  '3:12':  { spell: 'Create Water', prayer: "St Quister's Defence", page: 108},
+  '3:27':  { spell: 'Cure Affliction', prayer: "St Pastery's Blessing", page: 106},
+  '3:30':  { spell: 'Lesser Healing', prayer: 'Breath of St Lillibeth', page: 102},
+  '4:10':  { spell: 'Detect Evil', prayer: "St Whittery's Vision", page: 102},
+  '4:14':  { spell: 'Detect Magic', prayer: 'Wisdom of St Thorm', page: 102},
+  '4:18':  { spell: 'Holy Fire', prayer: "St Goodenough's Rebuke", page: 110},
+  '5:16':  { spell: 'Rally', prayer: "St Jorrael's Counsel", page: 103},
+  '5:22':  { spell: 'Frost Ward', prayer: "St Abthius' Rebuke", page: 102},
+  '6:3':   { spell: 'Find Traps', prayer: 'Path of St Gripe', page: 104},
+  '6:30':  { spell: 'Hold Person', prayer: "St Waylaine's Reproof", page: 105},
+  '7:16':  { spell: 'Insect Plague', prayer: 'Amity of St Cornice', page: 111},
+  '8:4':   { spell: 'Light', prayer: "St Foggarty's Benediction", page: 103},
+  '8:5':   { spell: 'Locate Object', prayer: "St Keye's Revelation", page: 107},
+  '8:9':   { spell: 'Remove Curse', prayer: "St Primula's Grace", page: 107},
+  '8:20':  { spell: 'Remove Poison', prayer: "St Torphia's Respite", page: 109},
+  '9:10':  { spell: 'Mantle of Protection', prayer: "St Benester's Word", page: 103},
+  '9:15':  { spell: 'Circle of Protection', prayer: "St Faxis' Abjuration", page: 108},
+  '9:25':  { spell: 'Purify Food and Drink', prayer: "St Gretchen's Sublimation", page: 103},
+  '9:28':  { spell: 'Holy Quest', prayer: 'Righteousness of St Galaunt', page: 111},
+  '10:3':  { spell: 'Greater Healing', prayer: 'Steadfastness of St Wick', page: 108},
+  '10:21': { spell: 'Flame Ward', prayer: 'Boldness of St Hollyhock', page: 104},
+  '10:25': { spell: 'Raise Dead', prayer: 'Mercy of St Clewyd', page: 111},
+  '10:29': { spell: 'Silence', prayer: 'Abjuration of St Signis', page: 105},
+  '11:7':  { spell: 'Serpent Transformation', prayer: "St Horace's Requital", page: 109},
+  '11:9':  { spell: 'Speak With Animals', prayer: 'Speech of St Hamfast', page: 105},
+  '11:24': { spell: 'Speak With Plants', prayer: 'Salvation of St Wort', page: 109},
+  '11:28': { spell: 'Charm Serpents', prayer: "St Dank's Plea", page: 104},
+  '12:10': { spell: 'Bless Weapon', prayer: 'Courage of St Sedge', page: 106},
+  '12:30': { spell: 'Reveal Alignment', prayer: "St Willofrith's Warning", page: 105},
+};
+
+// ============================================================================
+// DATE CONVERSION
+// ============================================================================
+// Default anchor: real-world Feb 26 2026 = Dolmenwood 9/7/1089
+const DEFAULT_ANCHOR_REAL = new Date(Date.UTC(2026, 1, 26));
+const DEFAULT_ANCHOR_DW = { year: 1089, month: 9, day: 7 };
+
+// Mutable anchor — user can override via Change Calibration Date
+let anchorReal = new Date(DEFAULT_ANCHOR_REAL.getTime());
+let anchorDwSerial; // set after dwSerial is defined
+
+function dwSerial(year, month, day) {
+  let serial = year * DAYS_PER_YEAR;
+  for (let i = 0; i < month - 1; i++) {
+    serial += MONTHS[i].len;
+  }
+  serial += (day - 1);
+  return serial;
+}
+
+const DEFAULT_ANCHOR_DW_SERIAL = dwSerial(DEFAULT_ANCHOR_DW.year, DEFAULT_ANCHOR_DW.month, DEFAULT_ANCHOR_DW.day);
+anchorDwSerial = DEFAULT_ANCHOR_DW_SERIAL;
+
+function serialToDw(serial) {
+  let year = Math.floor(serial / DAYS_PER_YEAR);
+  let rem = serial - year * DAYS_PER_YEAR;
+  if (rem < 0) { year -= 1; rem += DAYS_PER_YEAR; }
+  let month = 1;
+  for (let i = 0; i < MONTHS.length; i++) {
+    if (rem < MONTHS[i].len) {
+      return { year, month: i + 1, day: rem + 1 };
+    }
+    rem -= MONTHS[i].len;
+  }
+  return { year, month: 12, day: MONTHS[11].len };
+}
+
+function realDayDiff(a, b) {
+  const MS_PER_DAY = 86400000;
+  const aMid = Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate());
+  const bMid = Date.UTC(b.getUTCFullYear(), b.getUTCMonth(), b.getUTCDate());
+  return Math.round((aMid - bMid) / MS_PER_DAY);
+}
+
+function realToDw(realDate, offsetDays) {
+  const diff = realDayDiff(realDate, anchorReal);
+  const dwSerialN = anchorDwSerial + diff + (offsetDays || 0);
+  return serialToDw(dwSerialN);
+}
+
+function dwToReal(dw) {
+  const targetSerial = dwSerial(dw.year, dw.month, dw.day);
+  const dayDiff = targetSerial - anchorDwSerial;
+  const realMs = anchorReal.getTime() + dayDiff * 86400000;
+  return new Date(realMs);
+}
+
+function weekdayOf(month, day) {
+  if (day > 28) return null;
+  return WEEKDAYS[(day - 1) % 7];
+}
+
+function wysendayName(month, day) {
+  if (day <= 28) return null;
+  const m = MONTHS[month - 1];
+  return m.wysendays[day - 29] || null;
+}
+
+function formatDw(dw, opts) {
+  const m = MONTHS[dw.month - 1];
+  const wy = wysendayName(dw.month, dw.day);
+  if (wy) return `${wy} of ${m.name}, ${dw.year}`;
+  const wkd = weekdayOf(dw.month, dw.day);
+  if (opts && opts.short) return `${dw.day} ${m.name} ${dw.year}`;
+  return `${wkd}, the ${ordinal(dw.day)} of ${m.name}, ${dw.year}`;
+}
+
+function ordinal(n) {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+// ============================================================================
+// MOON PHASE
+// ============================================================================
+// Lunar cycle = 29 1/3 days (352 / 12). New Moon anchored to Grimvold day 4.
+const LUNAR_CYCLE = 352 / 12; // 29.333...
+const MOON_ANCHOR_DAY_OF_YEAR = 3; // Grimvold day 4 = absolute day index 3 (0-based)
+
+// ============================================================================
+// SUNRISE / SUNSET DATA  (indexed 1-12 by month ordinal)
+// ============================================================================
+const SUN_TIMES = {
+  1:  { rise: '8:00 AM',  set: '4:00 PM',  daylight: '8 hrs' },
+  2:  { rise: '8:00 AM',  set: '4:30 PM',  daylight: '8\u00bd hrs' },
+  3:  { rise: '7:30 AM',  set: '5:00 PM',  daylight: '9\u00bd hrs' },
+  4:  { rise: '6:30 AM',  set: '6:00 PM',  daylight: '11\u00bd hrs' },
+  5:  { rise: '6:00 AM',  set: '8:00 PM',  daylight: '14 hrs' },
+  6:  { rise: '5:00 AM',  set: '9:00 PM',  daylight: '16 hrs' },
+  7:  { rise: '4:30 AM',  set: '9:30 PM',  daylight: '17 hrs' },
+  8:  { rise: '5:00 AM',  set: '9:00 PM',  daylight: '16 hrs' },
+  9:  { rise: '6:00 AM',  set: '8:30 PM',  daylight: '15\u00bd hrs' },
+  10: { rise: '6:30 AM',  set: '7:30 PM',  daylight: '13 hrs' },
+  11: { rise: '7:30 AM',  set: '6:00 PM',  daylight: '10\u00bd hrs' },
+  12: { rise: '7:30 AM',  set: '4:30 PM',  daylight: '9 hrs' },
+};
+
+// ============================================================================
+// WEATHER TABLES
+// Each entry: { text, I, V, W }  (true = that condition applies)
+// Keyed by 2d6 result (2-12).
+// TODO: getWeatherTable() currently returns the standard seasonal table.
+//       When Hitching/Vague rules are provided, add the day/month trigger
+//       checks at the top of that function before the seasonal fallthrough.
+// ============================================================================
+const WEATHER = {
+  winter: {
+    2:  { text: 'Deep freeze, hoarfrost',  I:false, V:false, W:false },
+    3:  { text: 'Snow storm',              I:true,  V:true,  W:true  },
+    4:  { text: 'Relentless wind',         I:false, V:false, W:false },
+    5:  { text: 'Bitter, silent',          I:false, V:false, W:false },
+    6:  { text: 'Frigid, icy',             I:false, V:false, W:false },
+    7:  { text: 'Clear, cold',             I:false, V:false, W:false },
+    8:  { text: 'Freezing rain',           I:false, V:true,  W:true  },
+    9:  { text: 'Cold wind, gloomy',       I:false, V:false, W:false },
+    10: { text: 'Frigid mist',             I:false, V:true,  W:false },
+    11: { text: 'Icy, steady snow',        I:false, V:true,  W:true  },
+    12: { text: 'Relentless blizzard',     I:true,  V:true,  W:true  },
+  },
+  spring: {
+    2:  { text: 'Cold, gentle snow',       I:false, V:false, W:true  },
+    3:  { text: 'Chilly, damp',            I:false, V:false, W:true  },
+    4:  { text: 'Windy, cloudy',           I:false, V:false, W:false },
+    5:  { text: 'Brisk, clear',            I:false, V:false, W:false },
+    6:  { text: 'Clement, cheery',         I:false, V:false, W:false },
+    7:  { text: 'Warm, sunny',             I:false, V:false, W:false },
+    8:  { text: 'Bright, fresh',           I:false, V:false, W:false },
+    9:  { text: 'Blustery, drizzle',       I:false, V:false, W:true  },
+    10: { text: 'Pouring rain',            I:false, V:true,  W:true  },
+    11: { text: 'Gloomy, cool',            I:false, V:false, W:false },
+    12: { text: 'Chill mist',              I:false, V:true,  W:false },
+  },
+  summer: {
+    2:  { text: 'Cool winds',              I:false, V:false, W:false },
+    3:  { text: 'Low cloud, mist',         I:false, V:true,  W:false },
+    4:  { text: 'Warm, gentle rain',       I:false, V:false, W:true  },
+    5:  { text: 'Brooding thunder',        I:false, V:false, W:false },
+    6:  { text: 'Balmy, clear',            I:false, V:false, W:false },
+    7:  { text: 'Hot, humid',              I:false, V:false, W:false },
+    8:  { text: 'Overcast, muggy',         I:false, V:false, W:false },
+    9:  { text: 'Sweltering, still',       I:false, V:false, W:false },
+    10: { text: 'Baking, dry',             I:false, V:false, W:false },
+    11: { text: 'Warm wind',               I:false, V:false, W:false },
+    12: { text: 'Thunder storm',           I:false, V:true,  W:true  },
+  },
+  autumn: {
+    2:  { text: 'Torrential rain',         I:false, V:true,  W:true  },
+    3:  { text: 'Rolling fog',             I:false, V:true,  W:false },
+    4:  { text: 'Driving rain',            I:false, V:true,  W:true  },
+    5:  { text: 'Bracing wind',            I:false, V:false, W:false },
+    6:  { text: 'Balmy, clement',          I:false, V:false, W:false },
+    7:  { text: 'Clear, chilly',           I:false, V:false, W:false },
+    8:  { text: 'Drizzle, damp',           I:false, V:false, W:true  },
+    9:  { text: 'Cloudy, misty',           I:false, V:true,  W:false },
+    10: { text: 'Brooding clouds',         I:false, V:false, W:false },
+    11: { text: 'Frosty, chill',           I:false, V:false, W:false },
+    12: { text: 'Icy, gentle snow',        I:false, V:false, W:true  },
+  },
+  // TODO: wire up to specific day/month trigger conditions when rules are provided
+  hitching: {
+    2:  { text: 'Torrential rain',         I:false, V:true,  W:true  },
+    3:  { text: 'Clear, fresh dew',        I:false, V:false, W:true  },
+    4:  { text: 'Sleepy, purple mist',     I:false, V:true,  W:false },
+    5:  { text: 'Interminable drizzle',    I:false, V:false, W:true  },
+    6:  { text: 'Balmy mist',              I:false, V:true,  W:false },
+    7:  { text: 'Thick fog, hot',          I:false, V:true,  W:false },
+    8:  { text: 'Misty, seeping damp',     I:false, V:true,  W:true  },
+    9:  { text: 'Hazy fog, dripping',      I:false, V:true,  W:true  },
+    10: { text: 'Sticky dew drips',        I:false, V:false, W:true  },
+    11: { text: 'Gloomy, shadows drip',    I:false, V:false, W:false },
+    12: { text: 'Befuddling green fog',    I:false, V:true,  W:false },
+  },
+  // TODO: wire up to specific day/month trigger conditions when rules are provided
+  vague: {
+    2:  { text: 'Hoarfrost, freezing fog', I:false, V:true,  W:false },
+    3:  { text: 'Steady snow, icy mist',   I:false, V:true,  W:true  },
+    4:  { text: 'Low mist, writhing soil', I:false, V:false, W:false },
+    5:  { text: 'Sickly, yellow mist',     I:false, V:true,  W:false },
+    6:  { text: 'Thick, rolling fog',      I:false, V:true,  W:false },
+    7:  { text: 'Freezing fog',            I:false, V:true,  W:false },
+    8:  { text: 'Chill mist, winds wail',  I:false, V:true,  W:false },
+    9:  { text: 'Icy mist, eerie howling', I:false, V:true,  W:false },
+    10: { text: 'Violet mist rises',       I:false, V:true,  W:false },
+    11: { text: 'Blizzard, earth tremors', I:true,  V:true,  W:true  },
+    12: { text: 'Blizzard, dense fog',     I:true,  V:true,  W:true  },
+  },
+};
+
+// ============================================================================
+// SEEDED PRNG — mulberry32
+// All unseason and weather seeds use year * 100000 + unique offset so they
+// never collide with each other or with the weather seed (year * 10000 + ...).
+// ============================================================================
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// ============================================================================
+// UNSEASON TRIGGER FUNCTIONS
+// Each uses a unique seed namespace: year * 100000 + fixed offset per event.
+// ============================================================================
+
+// HITCHING
+function isHitching(dw) {
+  if (dw.month !== 1 || dw.day > 20) return false;
+  const triggerYear = dw.year - 1;
+  const seed = (triggerYear * 100000 + 1230) ^ (weatherSalt * 2654435761);
+  const rng = mulberry32(seed >>> 0);
+  return rng() < 0.25;
+}
+
+function isVague(dw) {
+  if (dw.month !== 2 && dw.month !== 3) return false;
+  const checkPoints = [];
+  for (const m of [2, 3]) {
+    for (const d of [1, 8, 15, 22]) {
+      if (m < dw.month || (m === dw.month && d <= dw.day)) {
+        checkPoints.push({ month: m, day: d });
+      }
+    }
+  }
+  for (const cp of checkPoints) {
+    const seed = (dw.year * 100000 + cp.month * 1000 + cp.day) ^ (weatherSalt * 2654435761);
+    const rng = mulberry32(seed >>> 0);
+    const triggered = rng() < 0.10;
+    if (triggered) {
+      const duration = Math.floor(rng() * 6) + 1;
+      const cpAbs = (cp.month === 2 ? 0 : MONTHS[1].len) + (cp.day - 1);
+      const dwAbs = (dw.month === 2 ? 0 : MONTHS[1].len) + (dw.day - 1);
+      if (dwAbs <= cpAbs + duration - 1) return true;
+    }
+  }
+  return false;
+}
+
+function isColliggwyld(dw) {
+  if (dw.month !== 6) return false;
+  const seed = (dw.year * 100000 + 601) ^ (weatherSalt * 2654435761);
+  const rng = mulberry32(seed >>> 0);
+  return rng() < 0.25;
+}
+
+function isChame(dw) {
+  if (dw.month !== 9) return false;
+  for (let d = 1; d <= 5; d++) {
+    const seed = (dw.year * 100000 + 900 + d) ^ (weatherSalt * 2654435761);
+    const rng = mulberry32(seed >>> 0);
+    const triggered = rng() < 0.05;
+    if (triggered) {
+      const die1 = Math.floor(rng() * 10) + 1;
+      const die2 = Math.floor(rng() * 10) + 1;
+      const duration = die1 + die2;
+      if (dw.day >= d && dw.day <= d + duration - 1) return true;
+      return false;
+    }
+  }
+  return false;
+}
+
+
+// Return array of active unseason objects for a given DW date.
+// Each object: { name, nature, effects, weather } where weather = true means
+// the unseason replaces the standard weather table.
+function getActiveUnseasons(dw) {
+  const active = [];
+  if (isHitching(dw)) {
+    active.push({
+      name: 'Hitching (p. 111)',
+      nature: 'The eternal night of Everborne encroaches. The wood is filled with dew and mists. Witches pray to the fey moon, which appears next to the true moon at night.',
+      effects: 'Refer to the Hitching table for Weather.',
+      weather: true,
+    });
+  }
+  if (isVague(dw)) {
+    active.push({
+      name: 'Vague (p. 111)',
+      nature: 'A thick fog emerges from the ground. The dead rise with this unseason \u2014 ghosts, phantoms, and ghouls wander the fogs.',
+      effects: 'Refer to the Vague table for Weather. Encounters have a 2-in-6 chance of being with undead.',
+      weather: true,
+    });
+  }
+  if (isColliggwyld(dw)) {
+    active.push({
+      name: 'Colliggwyld (p.111)',
+      nature: 'Beautiful fungal blooms grow to heights much taller than humans. On the last night of Iggwyld, they dissolve into a rainbow sludge that drains into nearby rivers.',
+      effects: 'When foraging, twice the amount of fungi are found.',
+      weather: false,
+    });
+  }
+  if (isChame(dw)) {
+    active.push({
+      name: 'Chame (p. 111)',
+      nature: 'During this time, snakes and serpents fill the wood. Travel can be dangerous and most mortals stay indoors.',
+      effects: 'Encounters in Chame have a 2-in-6 chance of being serpents and wyrms.',
+      weather: false,
+    });
+  }
+  return active;
+}
+
+// ============================================================================
+// WEATHER TABLE SELECTION
+// Hitching and Vague override the seasonal table when active.
+// ============================================================================
+function getWeatherTable(dw) {
+  if (isHitching(dw))    return WEATHER.hitching;
+  if (isVague(dw))       return WEATHER.vague;
+  // Standard seasonal fallthrough
+  if (dw.month <= 3)     return WEATHER.winter;
+  if (dw.month <= 6)     return WEATHER.spring;
+  if (dw.month <= 9)     return WEATHER.summer;
+  return WEATHER.autumn;
+}
+
+// Roll 2d6 deterministically for a given DW date.
+// Same year+month+day always produces the same result; different years differ.
+function weatherRoll(dw) {
+  const seed = (dw.year * 10000 + dw.month * 100 + dw.day) ^ (weatherSalt * 2654435761);
+  const rng = mulberry32(seed >>> 0);
+  const d1 = Math.floor(rng() * 6) + 1;
+  const d2 = Math.floor(rng() * 6) + 1;
+  return d1 + d2;
+}
+
+
+// Return the weather entry for a given DW date.
+function getWeather(dw) {
+  const table = getWeatherTable(dw);
+  const roll  = weatherRoll(dw);
+  return table[roll];
+}
+
+
+
+function moonPhaseOf(month, day) {
+  let absDay = 0;
+  for (let i = 0; i < month - 1; i++) absDay += MONTHS[i].len;
+  absDay += (day - 1);
+  const daysSinceNewMoon = absDay - MOON_ANCHOR_DAY_OF_YEAR;
+  const pos = ((daysSinceNewMoon % LUNAR_CYCLE) + LUNAR_CYCLE) % LUNAR_CYCLE;
+  return pos / LUNAR_CYCLE; // 0.0 = new moon, 0.5 = full moon
+}
+
+function moonName(phase) {
+  if (phase < 0.03 || phase > 0.97) return 'New Moon';
+  if (phase < 0.22) return 'Waxing Crescent';
+  if (phase < 0.28) return 'First Quarter';
+  if (phase < 0.47) return 'Waxing Gibbous';
+  if (phase < 0.53) return 'Full Moon';
+  if (phase < 0.72) return 'Waning Gibbous';
+  if (phase < 0.78) return 'Last Quarter';
+  return 'Waning Crescent';
+}
+
+// Large moon icon for the today card
+function moonIcon(phase) {
+  const r = 7;
+  const cx = 8, cy = 8;
+  if (phase < 0.03 || phase > 0.97) {
+    return `<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="${cx}" cy="${cy}" r="${r}" fill="#1a1612" stroke="#6b5e4e"/></svg>`;
+  }
+  if (phase > 0.47 && phase < 0.53) {
+    return `<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="${cx}" cy="${cy}" r="${r}" fill="#f9f3e3" stroke="#6b5e4e"/></svg>`;
+  }
+  const isWaxing = phase < 0.5;
+  const litFrac = (phase < 0.5) ? phase * 2 : (1 - phase) * 2;
+  const ellipseRx = r * (1 - 2 * litFrac);
+  const litSide = isWaxing
+    ? 'M ' + (cx) + ' ' + (cy - r) + ' A ' + r + ' ' + r + ' 0 0 1 ' + cx + ' ' + (cy + r) + ' A ' + Math.abs(ellipseRx) + ' ' + r + ' 0 0 ' + (ellipseRx > 0 ? 0 : 1) + ' ' + cx + ' ' + (cy - r) + ' Z'
+    : 'M ' + (cx) + ' ' + (cy - r) + ' A ' + r + ' ' + r + ' 0 0 0 ' + cx + ' ' + (cy + r) + ' A ' + Math.abs(ellipseRx) + ' ' + r + ' 0 0 ' + (ellipseRx > 0 ? 1 : 0) + ' ' + cx + ' ' + (cy - r) + ' Z';
+  return `<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="${cx}" cy="${cy}" r="${r}" fill="#1a1612" stroke="#6b5e4e"/><path d="${litSide}" fill="#f9f3e3"/></svg>`;
+}
+
+// Small moon marker for calendar day cells (new/full moon only).
+//
+// Key insight: the official Dolmenwood calendar places the marker on the first
+// full day AFTER the exact new/full moon moment — i.e. ceiling, not nearest.
+// In terms of pos (days elapsed since the last new moon, range [0, LUNAR_CYCLE)):
+//   • New moon:  pos ∈ [0, 1)  — the moon event fell sometime yesterday
+//   • Full moon: posFull ∈ [0, 1)  where posFull = (pos − half-cycle) mod cycle
+// This guarantees exactly one marked day per lunar event.
+function moonMarker(month, day) {
+  let absDay = 0;
+  for (let i = 0; i < month - 1; i++) absDay += MONTHS[i].len;
+  absDay += (day - 1);
+  const pos = ((absDay - MOON_ANCHOR_DAY_OF_YEAR) % LUNAR_CYCLE + LUNAR_CYCLE) % LUNAR_CYCLE;
+  if (pos < 1.0) {
+    return `<span class="moon-marker moon-new-marker" title="New Moon"><svg width="9" height="9" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.2" fill="#1a1612" stroke="#6b5e4e" stroke-width="0.8"/></svg></span>`;
+  }
+  const posFull = (pos - LUNAR_CYCLE / 2 + LUNAR_CYCLE) % LUNAR_CYCLE;
+  if (posFull < 1.0) {
+    return `<span class="moon-marker moon-full-marker" title="Full Moon"><svg width="9" height="9" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.2" fill="#f9f3e3" stroke="#6b5e4e" stroke-width="0.8"/></svg></span>`;
+  }
+  return '';
+}
+
+// ============================================================================
+// FEAST LOOKUP
+// ============================================================================
+function feastFor(month, day) {
+  return FEASTS[month + ':' + day] || null;
+}
+
+// ============================================================================
+// STATE
+// ============================================================================
+let currentDw = null;       // the year currently shown in the calendar grid
+let pinnedDw = null;         // the actually-selected date — drives the highlight
+let currentRealDate = null;
+let currentOffsetDays = 0;
+let showFullYear = false;
+let adventureRange = null; // { startDw: {year, month, day}, totalDays: number }
+
+// ============================================================================
+// LOCAL STORAGE — persist the current DW date so weather never shifts
+// on reload due to real-world date drift or calibration changes.
+// ============================================================================
+const LS_KEY      = 'dolmenwood_current_dw';
+const LS_SALT_KEY = 'dolmenwood_weather_salt';
+
+// Weather salt — incremented each time the user reshuffles weather.
+// XORed into every day's seed so all weather changes at once.
+// Initialised to a random value on first ever load so each user's
+// baseline weather is unique — rerolls never sync between users.
+let weatherSalt = 0;
+try {
+  const stored = localStorage.getItem(LS_SALT_KEY);
+  if (stored !== null && !isNaN(parseInt(stored, 10))) {
+    weatherSalt = parseInt(stored, 10);
+  } else {
+    // First load — use default seed 10C9KRB
+    weatherSalt = parseInt('10C9KRB', 36);
+    localStorage.setItem(LS_SALT_KEY, weatherSalt);
+  }
+} catch(e) {}
+
+function saveDwToStorage(dw) {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ year: dw.year, month: dw.month, day: dw.day }));
+  } catch(e) {}
+}
+
+function loadDwFromStorage() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (obj && obj.year && obj.month && obj.day) return obj;
+  } catch(e) {}
+  return null;
+}
+
+function clearDwStorage() {
+  try { localStorage.removeItem(LS_KEY); } catch(e) {}
+}
+
+
+
+// ── Dynamic subheading in header ──────────────────────────────────────────
+function formatDwSubheading(dw) {
+  const m = MONTHS[dw.month - 1];
+  return `${m.season} \u00b7 ${ordinal(m.ord)} Month \u00b7 ${ordinal(dw.day)} Day \u00b7 Year ${dw.year}`;
+}
+
+function updateSubheading(dw) {
+  const el = document.getElementById('date-sub');
+  if (el) el.textContent = formatDwSubheading(dw);
+}
+
+// ============================================================================
+// RENDERING
+// ============================================================================
+function renderTodayCard(dw, realDate, offsetDays) {
+  const m = MONTHS[dw.month - 1];
+  const wkd = weekdayOf(dw.month, dw.day);
+  const wy = wysendayName(dw.month, dw.day);
+  const phase = moonPhaseOf(dw.month, dw.day);
+  const moonNm = moonName(phase);
+  const feast = feastFor(dw.month, dw.day);
+  const unseasons = getActiveUnseasons(dw);
+  const hasUnseason = unseasons.length > 0;
+
+  let html = '';
+
+  // Zone 1: Date — flanked by day-nav arrows (same style as year arrows)
+  html += `<div class="today-date-nav">`;
+  html += `<button class="year-arrow" onclick="changeDay(-1)" title="Previous day" data-html2canvas-ignore="true"><svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="8,2 2,8 8,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+  html += `<div class="today-date-center">`;
+  if (wy) {
+    html += `<div class="today-weekday">\u2014 Wysenday \u2014</div>`;
+  } else {
+    html += `<div class="today-weekday">${wkd.toUpperCase()}</div>`;
+  }
+  const dayLabel = wy ? wy : `${ordinal(dw.day)} of ${m.name}`;
+  html += `<div class="today-bigdate">${dayLabel}</div>`;
+  html += `<div class="today-season">${ordinal(m.ord)} Month \u00b7 Year ${dw.year}</div>`;
+  html += `</div>`;
+  html += `<button class="year-arrow" onclick="changeDay(1)" title="Next day" data-html2canvas-ignore="true"><svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="2,2 8,8 2,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+  html += `</div>`;
+
+  // Zone 2: Special day (conditional)
+  if (feast && (feast.feast || feast.event)) {
+    html += `<div class="today-special">`;
+    if (feast.feast) html += `<div class="today-feasts">\u2726 ${feast.feast}</div>`;
+    if (feast.event) html += `<div class="today-events">\u2609 ${feast.event}</div>`;
+    if (feast.note)  html += `<div class="feast-detail">${feast.note.replace(/(Pluritine Observances:.*?)(Folk Observances:)/g, '$1<br>$2')}</div>`;
+    html += `</div>`;
+  }
+
+  // Miracle section (conditional — only on feast days with an associated saint miracle)
+  const miracleKey = `${dw.month}:${dw.day}`;
+  const miracle = MIRACLES[miracleKey];
+  if (miracle) {
+    html += `<div class="miracle-card">`;
+    html += `<div class="miracle-spell">${miracle.spell} \u2014 ${miracle.prayer}${miracle.page ? ' <span class="miracle-page">(p. ' + miracle.page + ')</span>' : ''}</span></div>`;
+
+    html += `</div>`;
+  }
+
+  // ── Zone 3: Weather & Unseasons ───────────────────────────────────────────
+  const wx = getWeather(dw);
+  html += `<div class="today-weather-zone">`;
+
+  if (hasUnseason) {
+    // Unseasons take over this zone
+    html += `<div class="today-unseasons">`;
+    for (const u of unseasons) {
+      html += `<div class="unseason-block">`;
+      html += `<div class="unseason-name">${u.name}</div>`;
+      html += `<div class="unseason-nature">${u.nature}</div>`;
+      html += `<div class="unseason-effects">${u.effects}</div>`;
+      html += `</div>`;
+    }
+    html += `</div>`;
+    // Weather — same style as standard, no season prefix, separated by a rule
+    html += `<div class="today-weather-zone" style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(107,94,78,0.2);">`;
+    html += `<div class="today-weather">${wx.text}</div>`;
+    const uImpacts = [];
+    if (wx.I) uImpacts.push('Travel impeded \u2014 daily Travel Points reduced by 2');
+    if (wx.V) uImpacts.push('Poor visibility \u2014 encounter distance halved, +1-in-6 chance of getting lost');
+    if (wx.W) uImpacts.push('Wet conditions \u2014 building a campfire is difficult');
+    if (uImpacts.length) {
+      html += `<div class="today-weather-impacts">`;
+      for (const imp of uImpacts) html += `<div class="today-weather-impact">${imp}</div>`;
+      html += `</div>`;
+    }
+    html += `</div>`;
+  } else {
+    // Standard weather
+    html += `<div class="today-weather">${m.season} \u00b7 ${wx.text}</div>`;
+    const impacts = [];
+    if (wx.I) impacts.push('Travel impeded \u2014 daily Travel Points reduced by 2');
+    if (wx.V) impacts.push('Poor visibility \u2014 encounter distance halved, +1-in-6 chance of getting lost');
+    if (wx.W) impacts.push('Wet conditions \u2014 building a campfire is difficult');
+    if (impacts.length) {
+      html += `<div class="today-weather-impacts">`;
+      for (const imp of impacts) html += `<div class="today-weather-impact">${imp}</div>`;
+      html += `</div>`;
+    }
+  }
+  html += `</div>`; // end weather zone
+
+  // ── Zone 4: Reference info ────────────────────────────────────────────────
+  const sun = SUN_TIMES[dw.month];
+  const sunSvgRise = `<svg width="12" height="12" viewBox="0 0 13 13" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="3" fill="var(--ochre)" stroke="none"/><g stroke="var(--ochre)" stroke-width="1.2" stroke-linecap="round"><line x1="6.5" y1="0.5" x2="6.5" y2="2.2"/><line x1="6.5" y1="10.8" x2="6.5" y2="12.5"/><line x1="0.5" y1="6.5" x2="2.2" y2="6.5"/><line x1="10.8" y1="6.5" x2="12.5" y2="6.5"/><line x1="2.1" y1="2.1" x2="3.3" y2="3.3"/><line x1="9.7" y1="9.7" x2="10.9" y2="10.9"/><line x1="10.9" y1="2.1" x2="9.7" y2="3.3"/><line x1="3.3" y1="9.7" x2="2.1" y2="10.9"/></g></svg>`;
+  const sunSvgSet  = `<svg width="12" height="12" viewBox="0 0 13 13" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="3" fill="var(--rust)" stroke="none" opacity="0.75"/><g stroke="var(--rust)" stroke-width="1.2" stroke-linecap="round" opacity="0.75"><line x1="6.5" y1="0.5" x2="6.5" y2="2.2"/><line x1="6.5" y1="10.8" x2="6.5" y2="12.5"/><line x1="0.5" y1="6.5" x2="2.2" y2="6.5"/><line x1="10.8" y1="6.5" x2="12.5" y2="6.5"/><line x1="2.1" y1="2.1" x2="3.3" y2="3.3"/><line x1="9.7" y1="9.7" x2="10.9" y2="10.9"/><line x1="10.9" y1="2.1" x2="9.7" y2="3.3"/><line x1="3.3" y1="9.7" x2="2.1" y2="10.9"/></g></svg>`;
+
+  let realLabel = realDate.toUTCString().slice(0, 16).toUpperCase();
+  if (offsetDays) realLabel += ` (+${offsetDays}d)`;
+
+  html += `<div class="today-reference">`;
+  html += `<span class="today-ref-item">${realLabel}</span>`;
+  html += `<span class="today-ref-divider">&middot;</span>`;
+  html += `<span class="today-ref-item">${moonIcon(phase)} ${moonNm.toUpperCase()}</span>`;
+  html += `<span class="today-ref-divider">&middot;</span>`;
+  html += `<span class="today-ref-item">${sunSvgRise} ${sun.rise}</span>`;
+  html += `<span class="today-ref-divider">&middot;</span>`;
+  html += `<span class="today-ref-item">${sunSvgSet} ${sun.set}</span>`;
+  html += `<span class="today-ref-divider">&middot;</span>`;
+  html += `<span class="today-ref-item">${sun.daylight} daylight</span>`;
+  html += `</div>`;
+
+  document.getElementById('today-card').innerHTML = html;
+}
+
+function renderMonthGrid(activeDw) {
+  const out = document.getElementById('months-wrap');
+  const yearEl = document.getElementById('year-display');
+  if (yearEl) yearEl.textContent = activeDw.year;
+  const toggleBtn = document.getElementById('toggle-full-year');
+  if (toggleBtn) toggleBtn.textContent = showFullYear ? 'Show Remaining Year' : 'Show Full Year';
+
+  // Adventure range: compute start & end serials if an adventure span is active.
+  // adventureRange = { startDw, totalDays } where totalDays >= 1 means a span exists.
+  let rangeStartSerial = null;
+  let rangeEndSerial = null;
+  if (adventureRange && adventureRange.totalDays > 0) {
+    rangeStartSerial = dwSerial(adventureRange.startDw.year, adventureRange.startDw.month, adventureRange.startDw.day);
+    rangeEndSerial = rangeStartSerial + adventureRange.totalDays - 1;
+  }
+
+  const monthsToShow = showFullYear ? MONTHS : MONTHS.filter(m => m.ord >= activeDw.month);
+  let html = '';
+  for (const m of monthsToShow) {
+    html += `<div class="month-card">`;
+    html += `<div class="month-name">${m.name}</div>`;
+    html += `<div class="month-meta">${m.season} &middot; ${m.ord}<sup>${m.ord===1?'st':m.ord===2?'nd':m.ord===3?'rd':'th'}</sup> Month</div>`;
+
+    html += `<div class="weekday-header">`;
+    for (const w of WEEKDAYS) html += `<div>${w.slice(0, 3).toUpperCase()}</div>`;
+    html += `</div>`;
+
+    html += `<div class="day-grid">`;
+    for (let day = 1; day <= 28; day++) {
+      const f = feastFor(m.ord, day);
+      const cellSerial = dwSerial(activeDw.year, m.ord, day);
+      const isToday = pinnedDw && (activeDw.year === pinnedDw.year && m.ord === pinnedDw.month && day === pinnedDw.day);
+      const cellDw = { year: activeDw.year, month: m.ord, day: day };
+      const classes = ['day-cell'];
+      // Unseason background — applied first so adventure/today classes override via CSS
+      if (getActiveUnseasons(cellDw).length > 0) classes.push('unseason');
+      // Apply range classes (start stays as `today`; end gets adventure-end; middle gets adventure-range)
+      if (rangeStartSerial !== null) {
+        if (cellSerial === rangeStartSerial) {
+          classes.push('today');
+        } else if (cellSerial === rangeEndSerial && rangeEndSerial !== rangeStartSerial) {
+          classes.push('adventure-end');
+        } else if (cellSerial > rangeStartSerial && cellSerial < rangeEndSerial) {
+          classes.push('adventure-range');
+        } else if (isToday) {
+          classes.push('today');
+        }
+      } else if (isToday) {
+        classes.push('today');
+      }
+      if (f && f.feast) classes.push('feast');
+      if (f && f.event) classes.push('event');
+      const marker = moonMarker(m.ord, day);
+      html += `<div class="${classes.join(' ')}" title="${dayTooltip(m.ord, day, f)}" data-month="${m.ord}" data-day="${day}"><div class="num">${day}</div>${marker}</div>`;
+    }
+    html += `</div>`;
+
+    if (m.len > 28) {
+      html += `<div class="wysenday-row">`;
+      for (let day = 29; day <= m.len; day++) {
+        const wy = wysendayName(m.ord, day);
+        const f = feastFor(m.ord, day);
+        const cellSerial = dwSerial(activeDw.year, m.ord, day);
+        const isToday = pinnedDw && (activeDw.year === pinnedDw.year && m.ord === pinnedDw.month && day === pinnedDw.day);
+        const cellDw = { year: activeDw.year, month: m.ord, day: day };
+        const classes = ['wysenday-cell'];
+        // Unseason background — applied first so adventure/today classes override via CSS
+        if (getActiveUnseasons(cellDw).length > 0) classes.push('unseason');
+        if (rangeStartSerial !== null) {
+          if (cellSerial === rangeStartSerial) {
+            classes.push('today');
+          } else if (cellSerial === rangeEndSerial && rangeEndSerial !== rangeStartSerial) {
+            classes.push('adventure-end');
+          } else if (cellSerial > rangeStartSerial && cellSerial < rangeEndSerial) {
+            classes.push('adventure-range');
+          } else if (isToday) {
+            classes.push('today');
+          }
+        } else if (isToday) {
+          classes.push('today');
+        }
+        let extra = '';
+        if (f && f.feast) extra = ' <span style="color:var(--rust);font-size:12px;line-height:1;">\u2726</span>';
+        const marker = moonMarker(m.ord, day);
+        // If this is the last wysenday and the total count is odd, span both columns
+        const wysenCount = m.len - 28;
+        const wysenIndex = day - 29; // 0-based
+        const isLastOdd = (wysenCount % 2 === 1) && (wysenIndex === wysenCount - 1);
+        const style = isLastOdd ? ' style="grid-column: 1 / -1;"' : '';
+        html += `<div class="${classes.join(' ')}" title="${dayTooltip(m.ord, day, f)}" data-month="${m.ord}" data-day="${day}"${style}>${marker}<span class="wysen-num">${day}</span><span class="wysen-name">${wy || ''}${extra}</span></div>`;
+      }
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+  out.innerHTML = html;
+
+  // Strip title tooltips on touch devices to prevent iOS tap-highlight bleed
+  if (window.matchMedia('(hover: none)').matches) {
+    out.querySelectorAll('[title]').forEach(el => el.removeAttribute('title'));
+  }
+
+  // Attach click handlers
+  out.querySelectorAll('.day-cell[data-month], .wysenday-cell[data-month]').forEach(el => {
+    el.addEventListener('click', () => {
+      const month = parseInt(el.getAttribute('data-month'), 10);
+      const day = parseInt(el.getAttribute('data-day'), 10);
+      selectDayFromCalendar(month, day);
+    });
+  });
+}
+
+function dayTooltip(month, day, f) {
+  const wkd = weekdayOf(month, day);
+  const wy = wysendayName(month, day);
+  const phase = moonPhaseOf(month, day);
+  const nm = moonName(phase);
+  let s = wy ? wy : `${wkd} ${day} ${MONTHS[month-1].name}`;
+  if (f) {
+    if (f.feast) s += ' \u2014 ' + f.feast;
+    if (f.event) s += ' \u2014 ' + f.event;
+  }
+  if (nm === 'New Moon' || nm === 'Full Moon') {
+    s += ' \u2726 ' + nm;
+  }
+  return s.replace(/"/g, '&quot;');
+}
+
+// ============================================================================
+// CLICK-A-DAY
+// ============================================================================
+function selectDayFromCalendar(month, day) {
+  const dw = { year: currentDw.year, month: month, day: day };
+  const realDate = dwToReal(dw);
+  const isoStr = realDate.getUTCFullYear() + '-' +
+    String(realDate.getUTCMonth() + 1).padStart(2, '0') + '-' +
+    String(realDate.getUTCDate()).padStart(2, '0');
+  document.getElementById('real-date').value = isoStr;
+  document.getElementById('off-days').value = 0;
+
+  currentDw = dw;
+  currentRealDate = realDate;
+  currentOffsetDays = 0;
+  adventureRange = null;
+  pinnedDw = dw;
+  saveDwToStorage(dw);
+
+  updateSubheading(dw);
+  renderTodayCard(dw, realDate, 0);
+  renderMonthGrid(dw);
+
+  document.getElementById('today-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ============================================================================
+// YEAR NAVIGATION
+// ============================================================================
+function changeYear(delta) {
+  const newYear = currentDw.year + delta;
+  const m = MONTHS[currentDw.month - 1];
+  const day = Math.min(currentDw.day, m.len);
+  const dw = { year: newYear, month: currentDw.month, day: day };
+
+  // Only update the browse year — pinnedDw stays on the real selected date
+  currentDw = dw;
+  adventureRange = null;
+  showFullYear = true;
+
+  renderMonthGrid(dw);
+}
+
+// ============================================================================
+// DAY NAVIGATION
+// ============================================================================
+function changeDay(delta) {
+  const serial = dwSerial(currentDw.year, currentDw.month, currentDw.day) + delta;
+  const dw = serialToDw(serial);
+  const realDate = dwToReal(dw);
+  const isoStr = realDate.getUTCFullYear() + '-' +
+    String(realDate.getUTCMonth() + 1).padStart(2, '0') + '-' +
+    String(realDate.getUTCDate()).padStart(2, '0');
+  document.getElementById('real-date').value = isoStr;
+  document.getElementById('off-days').value = 0;
+
+  currentDw = dw;
+  currentRealDate = realDate;
+  currentOffsetDays = 0;
+  adventureRange = null;
+  pinnedDw = dw;
+  saveDwToStorage(dw);
+
+  updateSubheading(dw);
+  renderTodayCard(dw, realDate, 0);
+  renderMonthGrid(dw);
+}
+
+// ============================================================================
+
+// ============================================================================
+// FULL YEAR TOGGLE
+// ============================================================================
+function toggleFullYear() {
+  showFullYear = !showFullYear;
+  renderMonthGrid(currentDw);
+}
+
+// ============================================================================
+// SEARCH: Feasts & Wysendays
+// ============================================================================
+function buildSearchIndex() {
+  // Build a flat list of all searchable entries: feasts, events, and wysendays
+  const entries = [];
+  // Feasts and events
+  for (const key in FEASTS) {
+    const [monthStr, dayStr] = key.split(':');
+    const month = parseInt(monthStr, 10);
+    const day = parseInt(dayStr, 10);
+    const f = FEASTS[key];
+    if (f.feast) entries.push({ label: f.feast, type: 'feast', month, day });
+    if (f.event) entries.push({ label: f.event, type: 'event', month, day });
+  }
+  // Wysendays
+  for (const m of MONTHS) {
+    for (let i = 0; i < m.wysendays.length; i++) {
+      entries.push({ label: m.wysendays[i], type: 'wysenday', month: m.ord, day: 29 + i });
+    }
+  }
+  return entries;
+}
+
+const SEARCH_INDEX = buildSearchIndex();
+
+function initSearch() {
+  const input = document.getElementById('feast-search');
+  const resultsDiv = document.getElementById('search-results');
+  if (!input || !resultsDiv) return;
+
+  input.addEventListener('input', () => {
+    const query = input.value.trim().toLowerCase();
+    if (query.length < 2) { resultsDiv.style.display = 'none'; return; }
+
+    const matches = SEARCH_INDEX.filter(e => e.label.toLowerCase().includes(query));
+    if (matches.length === 0) {
+      resultsDiv.innerHTML = '<div class="search-item" style="color:var(--ink-faded); cursor:default;">No results found</div>';
+      resultsDiv.style.display = 'block';
+      return;
+    }
+
+    resultsDiv.innerHTML = matches.slice(0, 15).map(e => {
+      const mName = MONTHS[e.month - 1].name;
+      const typeLabel = e.type === 'wysenday' ? 'Wysenday' : e.type === 'event' ? 'Observance' : 'Feast';
+      return `<div class="search-item" data-month="${e.month}" data-day="${e.day}">
+        <span class="search-label">${e.label}</span>
+      <span class="search-meta">${ordinal(e.day)} of ${mName} \u00b7 ${typeLabel}</span>
+      </div>`;
+    }).join('');
+    resultsDiv.style.display = 'block';
+
+    // Attach click handlers to results
+    resultsDiv.querySelectorAll('.search-item[data-month]').forEach(el => {
+      el.addEventListener('click', () => {
+        const month = parseInt(el.getAttribute('data-month'), 10);
+        const day = parseInt(el.getAttribute('data-day'), 10);
+        jumpToNextOccurrence(month, day);
+        resultsDiv.style.display = 'none';
+        input.value = '';
+      });
+    });
+  });
+
+  // Close results when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#search-card')) {
+      resultsDiv.style.display = 'none';
+    }
+  });
+
+  // Also close on Escape
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { resultsDiv.style.display = 'none'; input.blur(); }
+  });
+}
+
+function jumpToNextOccurrence(month, day) {
+  // Find the next upcoming occurrence of this month/day relative to the current DW date.
+  // If the date is today or later this year, use this year. Otherwise, next year.
+  let year = currentDw.year;
+  const currentSerial = dwSerial(currentDw.year, currentDw.month, currentDw.day);
+  const targetSerialThisYear = dwSerial(year, month, day);
+
+  if (targetSerialThisYear < currentSerial) {
+    year += 1; // Already passed this year, jump to next year
+  }
+
+  const dw = { year: year, month: month, day: day };
+  const realDate = dwToReal(dw);
+
+  const isoStr = realDate.getUTCFullYear() + '-' +
+    String(realDate.getUTCMonth() + 1).padStart(2, '0') + '-' +
+    String(realDate.getUTCDate()).padStart(2, '0');
+  document.getElementById('real-date').value = isoStr;
+  document.getElementById('off-days').value = 0;
+
+  currentDw = dw;
+  currentRealDate = realDate;
+  currentOffsetDays = 0;
+  adventureRange = null;
+  pinnedDw = dw;
+  saveDwToStorage(dw);
+
+  updateSubheading(dw);
+  renderTodayCard(dw, realDate, 0);
+  renderMonthGrid(dw);
+
+  document.getElementById('today-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ============================================================================
+// CALIBRATION
+// ============================================================================
+function applyCalibration() {
+  const realDateStr = document.getElementById('cal-real-date').value;
+  const dwMonth = parseInt(document.getElementById('cal-dw-month').value, 10);
+  const dwDay = parseInt(document.getElementById('cal-dw-day').value, 10);
+  const dwYear = parseInt(document.getElementById('cal-dw-year').value, 10);
+
+  if (!realDateStr || isNaN(dwMonth) || isNaN(dwDay) || isNaN(dwYear)) return;
+
+  // Clamp day to valid range for the selected month
+  const maxDay = MONTHS[dwMonth - 1].len;
+  const clampedDay = Math.max(1, Math.min(dwDay, maxDay));
+  document.getElementById('cal-dw-day').value = clampedDay;
+
+  // Update the mutable anchor
+  const [y, m, d] = realDateStr.split('-').map(Number);
+  anchorReal = new Date(Date.UTC(y, m - 1, d));
+  anchorDwSerial = dwSerial(dwYear, dwMonth, clampedDay);
+
+  // Recalculate everything from the current real-world date in the calculator
+  applyOffset();
+}
+
+function resetCalibration() {
+  // Restore default anchor
+  anchorReal = new Date(DEFAULT_ANCHOR_REAL.getTime());
+  anchorDwSerial = DEFAULT_ANCHOR_DW_SERIAL;
+
+  // Reset weather seed to default
+  weatherSalt = parseInt('10C9KRB', 36);
+  try { localStorage.setItem(LS_SALT_KEY, weatherSalt); } catch(e) {}
+  updateSeedInput();
+
+  // Reset the calibration fields to show current defaults
+  populateCalibrationDefaults();
+
+  // Recalculate (also clears adventure range via resetToToday)
+  adventureRange = null;
+  applyOffset();
+}
+
+function populateCalibrationDefaults() {
+  // Set real-world date to today
+  const today = new Date();
+  document.getElementById('cal-real-date').value = todayIsoString(today);
+
+  // Set DW fields to whatever today currently maps to
+  const dw = realToDw(today, 0);
+  document.getElementById('cal-dw-month').value = dw.month;
+  document.getElementById('cal-dw-day').value = dw.day;
+  document.getElementById('cal-dw-year').value = dw.year;
+
+  // Update day max based on selected month
+  const maxDay = MONTHS[dw.month - 1].len;
+  document.getElementById('cal-dw-day').max = maxDay;
+}
+
+// Update day max when month changes
+function initCalibrationListeners() {
+  const monthSelect = document.getElementById('cal-dw-month');
+  if (monthSelect) {
+    monthSelect.addEventListener('change', () => {
+      const m = parseInt(monthSelect.value, 10);
+      const dayInput = document.getElementById('cal-dw-day');
+      const maxDay = MONTHS[m - 1].len;
+      dayInput.max = maxDay;
+      if (parseInt(dayInput.value, 10) > maxDay) dayInput.value = maxDay;
+    });
+  }
+}
+
+// ============================================================================
+// ADVENTURE CALCULATOR — BIDIRECTIONAL DATE LINKING
+// ============================================================================
+// When the real-world date changes, update the DW adventure start fields.
+// When the DW fields change, update the real-world date.
+// A guard prevents infinite recursion.
+let _syncingAdventure = false;
+
+function syncDwFromReal() {
+  if (_syncingAdventure) return;
+  _syncingAdventure = true;
+  const dateInput = document.getElementById('real-date').value;
+  if (dateInput) {
+    const [y, m, d] = dateInput.split('-').map(Number);
+    const realDate = new Date(Date.UTC(y, m - 1, d));
+    const dw = realToDw(realDate, 0);
+    document.getElementById('adv-dw-month').value = dw.month;
+    document.getElementById('adv-dw-day').value = dw.day;
+    document.getElementById('adv-dw-day').max = MONTHS[dw.month - 1].len;
+    document.getElementById('adv-dw-year').value = dw.year;
+  }
+  _syncingAdventure = false;
+}
+
+function syncRealFromDw() {
+  if (_syncingAdventure) return;
+  _syncingAdventure = true;
+  const month = parseInt(document.getElementById('adv-dw-month').value, 10);
+  let day = parseInt(document.getElementById('adv-dw-day').value, 10);
+  const year = parseInt(document.getElementById('adv-dw-year').value, 10);
+  if (!isNaN(month) && !isNaN(day) && !isNaN(year)) {
+    // Clamp day
+    const maxDay = MONTHS[month - 1].len;
+    document.getElementById('adv-dw-day').max = maxDay;
+    if (day > maxDay) { day = maxDay; document.getElementById('adv-dw-day').value = day; }
+    if (day < 1) { day = 1; document.getElementById('adv-dw-day').value = day; }
+    const dw = { year, month, day };
+    const realDate = dwToReal(dw);
+    const isoStr = realDate.getUTCFullYear() + '-' +
+      String(realDate.getUTCMonth() + 1).padStart(2, '0') + '-' +
+      String(realDate.getUTCDate()).padStart(2, '0');
+    document.getElementById('real-date').value = isoStr;
+  }
+  _syncingAdventure = false;
+}
+
+function initAdventureListeners() {
+  // Real-world date → DW fields
+  const realInput = document.getElementById('real-date');
+  if (realInput) realInput.addEventListener('change', syncDwFromReal);
+
+  // DW fields → Real-world date
+  const dwMonth = document.getElementById('adv-dw-month');
+  const dwDay = document.getElementById('adv-dw-day');
+  const dwYear = document.getElementById('adv-dw-year');
+  if (dwMonth) dwMonth.addEventListener('change', syncRealFromDw);
+  if (dwDay) dwDay.addEventListener('change', syncRealFromDw);
+  if (dwYear) dwYear.addEventListener('change', syncRealFromDw);
+}
+
+// ============================================================================
+// CONTROLLER
+// ============================================================================
+function applyOffset() {
+  const dateInput = document.getElementById('real-date').value;
+  const totalDays = parseInt(document.getElementById('off-days').value, 10) || 0;
+  let realDate;
+  if (dateInput) {
+    const [y, m, d] = dateInput.split('-').map(Number);
+    realDate = new Date(Date.UTC(y, m - 1, d));
+  } else {
+    realDate = new Date();
+  }
+
+  // Start DW date (no offset) — the adventure start.
+  const startDw = realToDw(realDate, 0);
+
+  // Today card shows the start date (Option C — today card is unchanged by totalDays).
+  // The calendar range highlights start through start + totalDays - 1 (inclusive).
+  // totalDays = 0 means no span, just highlight the start day normally.
+  const dw = startDw;
+
+  if (totalDays >= 1) {
+    adventureRange = { startDw, totalDays };
+  } else {
+    adventureRange = null;
+  }
+
+  currentDw = dw;
+  currentRealDate = realDate;
+  currentOffsetDays = totalDays;
+  pinnedDw = dw;
+  saveDwToStorage(dw);
+
+  // Sync the DW adventure start fields to match the start date.
+  _syncingAdventure = true;
+  document.getElementById('adv-dw-month').value = startDw.month;
+  document.getElementById('adv-dw-day').value = startDw.day;
+  document.getElementById('adv-dw-day').max = MONTHS[startDw.month - 1].len;
+  document.getElementById('adv-dw-year').value = startDw.year;
+  _syncingAdventure = false;
+
+  updateSubheading(dw);
+  renderTodayCard(dw, realDate, 0);
+  renderMonthGrid(dw);
+}
+
+function resetToToday() {
+  const today = new Date();
+  document.getElementById('real-date').value = todayIsoString(today);
+  document.getElementById('off-days').value = 0;
+  adventureRange = null;
+  clearDwStorage();
+  applyOffset();
+}
+
+// ============================================================================
+// WEATHER SEED
+// ============================================================================
+
+// Convert any string to a stable 32-bit integer (djb2 hash)
+function strToSalt(str) {
+  if (!str) return (Math.random() * 0xFFFFFFFF) >>> 0;
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    hash = hash >>> 0; // keep 32-bit unsigned
+  }
+  return hash;
+}
+
+// Display the current salt as a readable seed string in the input
+function updateSeedInput() {
+  const el = document.getElementById('weather-seed-input');
+  if (el && !el.matches(':focus')) el.value = weatherSalt.toString(36).toUpperCase();
+}
+
+// Apply a user-typed seed
+function applySeed() {
+  const el = document.getElementById('weather-seed-input');
+  const raw = el ? el.value.trim() : '';
+  if (!raw) return;
+  // If the user typed back an exact base-36 salt value, use it directly;
+  // otherwise hash the string so any phrase works as a seed.
+  const asInt = parseInt(raw, 36);
+  weatherSalt = (!isNaN(asInt) && asInt.toString(36).toUpperCase() === raw.toUpperCase())
+    ? (asInt >>> 0)
+    : strToSalt(raw);
+  try { localStorage.setItem(LS_SALT_KEY, weatherSalt); } catch(e) {}
+  updateSeedInput();
+  renderTodayCard(currentDw, currentRealDate, currentOffsetDays);
+  renderMonthGrid(currentDw);
+}
+
+function confirmAndReset() {
+  weatherSalt = (Math.random() * 0xFFFFFFFF) >>> 0;
+  try { localStorage.setItem(LS_SALT_KEY, weatherSalt); } catch(e) {}
+  updateSeedInput();
+  renderTodayCard(currentDw, currentRealDate, currentOffsetDays);
+  renderMonthGrid(currentDw);
+}
+
+
+function todayIsoString(d) {
+  const yy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yy}-${mm}-${dd}`;
+}
+
+// ============================================================================
+// CAPTURE — export today card as PNG
+// ============================================================================
+async function captureTodayCard() {
+  const btn = document.getElementById('capture-btn');
+  if (btn) { btn.style.opacity = '0'; btn.disabled = true; }
+
+  try {
+    const card = document.getElementById('today-card');
+    if (!card) { alert('Nothing to capture.'); return; }
+
+    const scale = Math.min(Math.max(window.devicePixelRatio || 2, 2), 4);
+
+    const raw = await html2canvas(card, {
+      backgroundColor: '#ffffff',
+      scale: scale,
+      useCORS: true,
+      logging: false,
+      ignoreElements: el => el.hasAttribute('data-html2canvas-ignore')
+    });
+
+    // Uniform padding
+    const pad = Math.round(24 * scale);
+    const out = document.createElement('canvas');
+    out.width  = raw.width  + pad * 2;
+    out.height = raw.height + pad * 2;
+    const ctx = out.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, out.width, out.height);
+    ctx.drawImage(raw, pad, pad);
+
+    const dw = currentDw || {};
+    const filename = `dolmenwood_${dw.year || 'date'}_m${dw.month || ''}_d${dw.day || ''}.png`;
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = out.toDataURL('image/png');
+    link.click();
+  } finally {
+    if (btn) { btn.style.opacity = ''; btn.disabled = false; }
+  }
+}
+
+
+// Init on page load — restore stored DW date if available, else default to today
+window.addEventListener('DOMContentLoaded', () => {
+  populateCalibrationDefaults();
+  initCalibrationListeners();
+  initAdventureListeners();
+  initSearch();
+
+  const stored = loadDwFromStorage();
+  if (stored) {
+    // Restore the stored DW date — weather stays consistent
+    const realDate = dwToReal(stored);
+    const isoStr = realDate.getUTCFullYear() + '-' +
+      String(realDate.getUTCMonth() + 1).padStart(2, '0') + '-' +
+      String(realDate.getUTCDate()).padStart(2, '0');
+    document.getElementById('real-date').value = isoStr;
+    document.getElementById('off-days').value = 0;
+    currentDw = stored;
+    pinnedDw = stored;
+    currentRealDate = realDate;
+    currentOffsetDays = 0;
+    adventureRange = null;
+    _syncingAdventure = true;
+    document.getElementById('adv-dw-month').value = stored.month;
+    document.getElementById('adv-dw-day').value = stored.day;
+    document.getElementById('adv-dw-day').max = MONTHS[stored.month - 1].len;
+    document.getElementById('adv-dw-year').value = stored.year;
+    _syncingAdventure = false;
+    updateSubheading(stored);
+    renderTodayCard(stored, realDate, 0);
+    renderMonthGrid(stored);
+  } else {
+    resetToToday();
+  }
+  document.addEventListener('keydown', (e) => {
+    const tag = document.activeElement ? document.activeElement.tagName : '';
+    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); changeDay(-1); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); changeDay(1); }
+  });
+
+  updateSeedInput();
+
+  // Remove title attributes on touch devices — prevents iOS from showing
+  // a tooltip preview highlight on the cell above the one being tapped
+  if (window.matchMedia('(hover: none)').matches) {
+    document.querySelectorAll('.day-cell[title], .wysenday-cell[title]').forEach(el => {
+      el.removeAttribute('title');
+    });
+  }
+});
+</script>
+</body>
+</html>
