@@ -1,963 +1,349 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dolmenwood Calendar</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<meta name="viewport" content="width=1872, height=702, initial-scale=1">
+<title>Dolmenwood Calendar — TRMNL</title>
 <style>
 :root {
-  --ink: #1a1612;
-  --ink-soft: #3a342c;
-  --ink-faded: #6b5e4e;
-  --parchment: #f1e9d8;
-  --parchment-deep: #e8dcc3;
-  --parchment-light: #f9f3e3;
-  --moss: #556b3d;
-  --moss-deep: #3e4f2c;
-  --ochre: #a87838;
-  --rust: #8a3a24;
-  --sky: #5b6e7a;
-  --shadow: rgba(26, 22, 18, 0.18);
-  --moon-new: #1a1612;
-  --moon-full: #f9f3e3;
+  --white: #ffffff;
+  --black: #000000;
+  --grey: #7d7d7d; /* 125,125,125 */
 }
 * { box-sizing: border-box; }
-body {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 16px;
-  line-height: 1.55;
-  color: var(--ink);
-  background: var(--parchment);
-  background-image:
-    radial-gradient(ellipse at 10% 5%, rgba(168,120,56,0.07) 0%, transparent 50%),
-    radial-gradient(ellipse at 90% 95%, rgba(85,107,61,0.08) 0%, transparent 55%),
-    radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(26,22,18,0.04) 100%);
-  min-height: 100vh;
-  padding: 20px 16px 60px;
-}
-.container { max-width: 1100px; margin: 0 auto; }
-
-/* ── Header ── */
-header {
-  text-align: center;
-  padding: 30px 10px 22px;
-  border-bottom: 1px solid var(--ink-faded);
-  margin-bottom: 24px;
-  position: relative;
-}
-h1 {
-  font-family: 'IM Fell English SC', 'Cormorant Garamond', serif;
-  font-size: clamp(28px, 5vw, 44px);
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  color: var(--ink);
-  margin: 0 0 6px;
-}
-header .sub {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 16px;
-  color: var(--ink-faded);
-  margin: 4px 0 0;
-}
-
-
-
-/* ── Cards ── */
-.card {
-  background: var(--parchment-light);
-  border: 1px solid var(--ink-faded);
-  border-radius: 2px;
-  padding: 22px 26px;
-  margin-bottom: 18px;
-  box-shadow: 0 2px 8px var(--shadow);
-  position: relative;
-}
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border: 1px solid rgba(107, 94, 78, 0.2);
-  pointer-events: none;
-  border-radius: 1px;
-}
-.scene-title {
-  font-family: 'IM Fell English SC', serif;
-  font-size: 20px;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid var(--ink-faded);
-  padding-bottom: 8px;
-  margin-bottom: 14px;
-  color: var(--ink);
-}
-.section-title {
-  font-family: 'IM Fell English SC', serif;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  color: var(--ink-faded);
-  margin: 18px 0 6px;
-  text-transform: uppercase;
-}
-label {
-  font-family: 'IM Fell English SC', serif;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--ink-faded);
-  display: block;
-  margin-bottom: 4px;
-}
-input[type="number"], input[type="date"] {
-  font-family: 'EB Garamond', serif;
-  font-size: 16px;
-  color: var(--ink);
-  background: var(--parchment);
-  border: 1px solid var(--ink-faded);
-  border-radius: 2px;
-  padding: 8px 10px;
-}
-input:focus { outline: none; border-color: var(--rust); }
-button.go {
-  font-family: 'IM Fell English SC', serif;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  color: var(--parchment-light);
-  background: var(--moss-deep);
-  border: none;
-  padding: 10px 22px;
-  cursor: pointer;
-  border-radius: 2px;
-  height: 38px;
-}
-button.go:hover { background: var(--moss); }
-button.link {
-  background: none;
-  border: none;
-  color: var(--rust);
-  font-family: 'EB Garamond', serif;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 4px 8px;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-}
-button.link:hover { color: var(--ink); }
-
-/* Today card */
-.today-card-wrap {
-  position: relative;
-  margin-bottom: 18px;
-}
-.today-card-wrap .card {
-  margin-bottom: 0;
-}
-.today-card { text-align: center; }
-.today-date-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 4px;
-}
-.today-date-center {
-  flex: 1;
-  text-align: center;
-}
-
-.capture-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  color: var(--ink-faded);
-  background: transparent;
-  border: none;
-  border-radius: 4px;
+html, body {
+  width: 1872px;
+  height: 702px;
+  margin: 0;
   padding: 0;
-  cursor: pointer;
-  opacity: 0.35;
-  transition: opacity 0.15s, color 0.15s;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  z-index: 2;
+  overflow: hidden;
+  background: var(--white);
+  color: var(--black);
 }
-.capture-btn:hover, .capture-btn:active {
-  opacity: 0.9;
-  color: var(--ochre);
+body {
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.3;
+  font-weight: 600;
 }
 
+.screen {
+  width: 1872px;
+  height: 702px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  padding: 30px 36px;
+}
 
+/* ── Left column: Today card ── */
+.today-col {
+  flex: 0 0 1100px;
+  display: flex;
+  flex-direction: column;
+  padding-right: 36px;
+  border-right: 2px solid var(--grey);
+  min-width: 0;
+}
+.today-card {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
 
+/* ── Right column: current month ── */
+.month-col {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding-left: 36px;
+  min-width: 0;
+}
 
 /* Zone 1: Date */
 .today-weekday {
-  font-family: 'IM Fell English SC', serif;
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  color: var(--ink-faded);
-  margin-bottom: 4px;
+  font-size: 20px;
+  letter-spacing: 0.1em;
+  color: var(--grey);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 2px;
 }
 .today-bigdate {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(36px, 6vw, 56px);
-  line-height: 1.1;
-  font-weight: 500;
-  margin: 2px 0 0;
-  color: var(--ink);
+  font-size: 72px;
+  line-height: 1.02;
+  font-weight: 800;
+  color: var(--black);
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 .today-season {
-  font-family: 'EB Garamond', serif;
-  font-style: italic;
-  font-size: 12px;
-  color: var(--ink-faded);
-  margin: 3px 0 0;
+  font-size: 20px;
+  color: var(--grey);
+  font-weight: 700;
+  margin: 4px 0 0;
 }
 
 /* Zone 2: Special day */
 .today-special {
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px solid rgba(107, 94, 78, 0.2);
+  border-top: 2px solid var(--grey);
 }
-.today-feasts {
-  font-family: 'EB Garamond', serif;
-  color: var(--rust);
-  font-size: 16px;
+.today-feasts, .today-events {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--black);
   margin: 0;
 }
-.today-events {
-  font-family: 'EB Garamond', serif;
-  color: var(--moss-deep);
-  font-size: 16px;
-  margin: 4px 0 0;
-}
+.today-events { margin-top: 4px; }
 .feast-detail {
-  font-family: 'EB Garamond', serif;
-  font-size: 12px;
-  color: var(--ink);
-  color: var(--ink);
-  margin: 6px auto 0;
-  max-width: 560px;
-  text-align: left;
-  line-height: 1.5;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--black);
+  margin: 8px 0 0;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-.feast-detail strong { font-weight: 600; font-style: normal; color: var(--ink); }
+.feast-detail strong { font-weight: 800; }
 
-/* Zone 3: Weather & Unseasons */
+/* Miracle */
+.miracle-card {
+  margin-top: 10px;
+  padding-top: 10px;
+}
+.miracle-spell {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--black);
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* Zone 3: Weather / Unseasons */
 .today-weather-zone {
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px solid rgba(107, 94, 78, 0.2);
+  border-top: 2px solid var(--grey);
 }
 .today-weather {
-  font-family: 'EB Garamond', serif;
-  font-size: 16px;
-  color: var(--ink);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--black);
   margin: 0;
 }
 .today-weather-impacts {
-  margin-top: 4px;
+  margin-top: 6px;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
 }
 .today-weather-impact {
-  font-family: 'EB Garamond', serif;
-  font-size: 12px;
-  color: var(--rust);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--black);
 }
-/* Unseasons — take over weather zone */
-.today-unseasons {
-  margin: 0;
-  padding: 0;
-}
-.unseason-block {
-  margin-bottom: 10px;
-  text-align: left;
-  max-width: 560px;
-  margin-left: auto;
-  margin-right: auto;
-}
+.unseason-block { margin-bottom: 8px; }
 .unseason-block:last-child { margin-bottom: 0; }
 .unseason-name {
-  font-family: 'IM Fell English SC', serif;
-  font-size: 20px;
-  letter-spacing: 0.04em;
-  color: var(--moss-deep);
-  margin-bottom: 4px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--black);
+  margin-bottom: 2px;
 }
 .unseason-nature {
-  font-family: 'EB Garamond', serif;
-  font-style: italic;
   font-size: 16px;
-  color: var(--ink-soft);
-  line-height: 1.5;
-  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--black);
+  line-height: 1.35;
+  margin-bottom: 2px;
 }
 .unseason-effects {
-  font-family: 'EB Garamond', serif;
-  font-size: 12px;
-  color: var(--rust);
-  line-height: 1.45;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--black);
+  line-height: 1.3;
 }
 
-/* Miracle card */
-.miracle-card {
-  margin-top: 12px;
-  padding-top: 10px;
-  text-align: left;
-}
-.miracle-title {
-  font-family: 'IM Fell English SC', serif;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--ink);
-  margin-bottom: 4px;
-  text-align: center;
-}
-.miracle-spell {
- font-family: 'EB Garamond', serif;
-  font-size: 12px;
-  color: var(--ink);
-  color: var(--ink);
-  margin: 6px auto 0;
-  max-width: 560px;
-  text-align: left;
-  line-height: 1.5;
-}
-.miracle-page {
-  font-family: 'EB Garamond', serif;
-  font-size: 12px;
-  color: var(--ink);
-  color: var(--ink);
-  margin: 6px auto 0;
-  max-width: 560px;
-  text-align: left;
-  line-height: 1.5;
-}
-
-/* Zone 4: Reference info */
+/* Zone 4: Reference row */
 .today-reference {
-  margin-top: 14px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(107, 94, 78, 0.2);
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 2px solid var(--grey);
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   align-items: center;
-  gap: 6px 16px;
+  gap: 8px 20px;
 }
 .today-ref-item {
-  font-family: 'IM Fell English SC', serif;
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  color: var(--ink-faded);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--black);
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  white-space: nowrap;
 }
 .today-ref-divider {
-  color: rgba(107, 94, 78, 0.3);
-  font-size: 12px;
-}
-.moon-icon {
-  display: inline-block;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  border: 1px solid var(--ink-faded);
-  vertical-align: middle;
+  color: var(--grey);
+  font-size: 16px;
+  font-weight: 700;
 }
 
-/* ── Offset row ── */
-.offset-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 14px;
-  justify-content: center;
-}
-.offset-row .field { display: flex; flex-direction: column; }
-.offset-row input[type="number"] { width: 80px; }
-.offset-row input[type="date"] { width: 220px; }
-
-/* ── Month grid ── */
-.months-wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.month-card {
-  background: var(--parchment-light);
-  border: 1px solid var(--ink-faded);
-  border-radius: 2px;
-  padding: 14px 14px 12px;
-  box-shadow: 0 2px 8px var(--shadow);
-  position: relative;
-}
-.month-card::before {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border: 1px solid rgba(107, 94, 78, 0.18);
-  pointer-events: none;
-  border-radius: 1px;
-}
+/* ── Month card (right column) ── */
 .month-name {
-  font-family: 'IM Fell English SC', serif;
-  font-size: 20px;
-  letter-spacing: 0.05em;
-  color: var(--ink);
-  margin: 0 0 2px;
-  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--black);
+  margin: 0;
 }
 .month-meta {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  text-align: center;
-  font-size: 12px;
-  color: var(--ink-faded);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--grey);
   margin-bottom: 10px;
-  border-bottom: 1px solid rgba(107, 94, 78, 0.25);
+  border-bottom: 2px solid var(--grey);
   padding-bottom: 8px;
 }
 .weekday-header {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  gap: 3px;
   margin-bottom: 4px;
 }
 .weekday-header div {
-  font-family: 'IM Fell English SC', serif;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--ink-faded);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--grey);
   text-align: center;
-  padding-bottom: 2px;
 }
 .day-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  gap: 3px;
 }
 .day-cell {
   aspect-ratio: 1 / 1;
-  background: var(--parchment);
-  border: 1px solid rgba(107, 94, 78, 0.2);
+  background: var(--white);
+  border: 2px solid var(--grey);
   position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: 'EB Garamond', serif;
-  font-size: 12px;
-  border-radius: 1px;
-  padding: 1px;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: 2px;
 }
-.day-cell:hover {
-  background: var(--parchment-deep);
-  border-color: var(--ochre);
-}
-.day-cell .num {
-  font-weight: 600;
-  line-height: 1;
-}
-.day-cell .marker {
-  font-size: 12px;
-  color: var(--rust);
-  margin-top: 1px;
-}
+.day-cell .num { line-height: 1; }
 .day-cell.today {
-  background: var(--ochre);
-  color: var(--parchment-light);
-  border-color: var(--ochre);
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
 }
-.day-cell.today:hover { background: #c08a42; }
-.day-cell.today .marker { color: var(--parchment-light); }
-
-/* Adventure range: days within an adventure span (excluding start) */
-.day-cell.adventure-range {
-  background: #e8d4a8;
-  border-color: var(--ochre);
-  color: var(--ink);
-}
-.day-cell.adventure-range:hover { background: #dcc396; }
-/* End of adventure (last day) */
-.day-cell.adventure-end {
-  background: var(--rust);
-  color: var(--parchment-light);
-  border-color: var(--rust);
-}
-.day-cell.adventure-end:hover { background: #a04930; }
-.day-cell.adventure-end.feast::after { color: var(--parchment-light); }
-/* Wysenday adventure variants */
-.wysenday-cell.adventure-range {
-  background: #e8d4a8;
-  border-color: var(--ochre);
-}
-.wysenday-cell.adventure-range:hover { background: #dcc396; }
-.wysenday-cell.adventure-end {
-  background: var(--rust);
-  color: var(--parchment-light);
-  border-color: var(--rust);
-}
-.wysenday-cell.adventure-end:hover { background: #a04930; }
-.wysenday-cell.adventure-end .wysen-num { color: var(--parchment-light); }
-.wysenday-cell.adventure-end .wysen-name { color: var(--parchment-light); }
-
-/* Unseason days — unified grey, lower priority than adventure range/end/today */
+/* Unseason days — grey fill, black text/border for legibility */
 .day-cell.unseason {
-  background: #c8c4bc;
-  border-color: #a8a49c;
-  color: var(--ink);
+  background: var(--grey);
+  border-color: var(--black);
+  color: var(--black);
 }
-.day-cell.unseason:hover {
-  background: #b8b4ac;
-  border-color: #989490;
+.day-cell.today.unseason {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
 }
-.wysenday-cell.unseason {
-  background: #c8c4bc;
-  border-color: #a8a49c;
-}
-.wysenday-cell.unseason:hover {
-  background: #b8b4ac;
-  border-color: #989490;
-}
-/* Adventure range/end/today always override unseason */
-.day-cell.today.unseason,
-.day-cell.adventure-range.unseason,
-.day-cell.adventure-end.unseason {
-  background: inherit;
-  border-color: inherit;
-  color: inherit;
-}
-
 /* Feast marker: top-right star */
 .day-cell.feast::after {
   content: "\2726";
   position: absolute;
-  top: 1px; right: 2px;
-  font-size: 12px;
-  color: var(--rust);
+  top: 1px; right: 3px;
+  font-size: 16px;
+  color: var(--black);
   line-height: 1;
 }
-.day-cell.today.feast::after { color: var(--parchment-light); }
-
-/* Equinox/solstice: green bottom bar */
-.day-cell.event {
-  border-color: var(--moss);
-}
+.day-cell.today.feast::after { color: var(--white); }
+/* Equinox/solstice: bottom bar */
 .day-cell.event::before {
   content: "";
   position: absolute;
-  bottom: 1px; left: 1px; right: 1px;
-  height: 2px;
-  background: var(--moss);
+  bottom: 2px; left: 4px; right: 4px;
+  height: 3px;
+  background: var(--black);
   border-radius: 1px;
 }
+.day-cell.today.event::before { background: var(--white); }
 
-/* ── Moon markers in day cells ── */
+/* Moon markers in day cells */
 .moon-marker {
   position: absolute;
-  top: 1px;
-  left: 2px;
+  top: 2px;
+  left: 3px;
   line-height: 1;
-  pointer-events: none;
   display: flex;
   align-items: center;
 }
-.moon-marker svg {
-  display: block;
-}
-/* On today cells (ochre bg), boost visibility of the full moon outline */
-.day-cell.today .moon-marker.moon-full-marker svg circle {
-  stroke: var(--parchment-deep);
-}
+.moon-marker svg { display: block; }
 
-/* Wysendays — styled like regular day cells but wider with name inline, 2-per-row */
+/* Wysendays */
 .wysenday-row {
-  margin-top: 2px;
+  margin-top: 3px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2px;
+  gap: 3px;
 }
 .wysenday-cell {
-  min-width: 0;
-  min-height: 32px;
-  background: var(--parchment);
-  border: 1px solid rgba(107, 94, 78, 0.2);
-  border-radius: 1px;
-  font-family: 'EB Garamond', serif;
-  font-size: 12px;
-  font-style: normal;
-  color: var(--ink);
+  min-height: 60px;
+  background: var(--white);
+  border: 2px solid var(--grey);
+  border-radius: 2px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--black);
   display: flex;
-  flex-direction: row;
   align-items: center;
-  padding: 4px 8px;
-  gap: 8px;
+  padding: 6px 10px;
+  gap: 10px;
   line-height: 1.2;
   position: relative;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-.wysenday-cell:hover {
-  background: var(--parchment-deep);
-  border-color: var(--ochre);
 }
 .wysenday-cell .wysen-num {
-  font-family: 'EB Garamond', serif;
-  font-style: normal;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0;
-  color: var(--ink);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--black);
   flex-shrink: 0;
-  line-height: 1;
 }
 .wysenday-cell .wysen-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 12px;
-  color: var(--ink-soft);
-  line-height: 1.2;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--black);
 }
 .wysenday-cell.today {
-  background: var(--ochre);
-  color: var(--parchment-light);
-  border-color: var(--ochre);
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
 }
-.wysenday-cell.today:hover { background: #c08a42; }
-.wysenday-cell.today .wysen-num { color: var(--parchment-light); }
-.wysenday-cell.today .wysen-name { color: var(--parchment-light); }
-
-/* ── Legend ── */
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: center;
-  margin-bottom: 14px;
-  margin-top: 0;
-  font-family: 'EB Garamond', serif;
-  font-size: 12px;
-  color: var(--ink-faded);
+.wysenday-cell.today .wysen-num,
+.wysenday-cell.today .wysen-name { color: var(--white); }
+.wysenday-cell.unseason {
+  background: var(--grey);
+  border-color: var(--black);
 }
-.legend-item { display: flex; align-items: center; gap: 6px; }
-.legend-swatch {
-  width: 14px; height: 14px;
-  border: 1px solid rgba(107,94,78,0.4);
-  background: var(--parchment);
-  position: relative;
-  flex-shrink: 0;
-}
-.legend-swatch.today-sw { background: var(--ochre); border-color: var(--ochre); }
-.legend-swatch.feast-sw::after { content: "\2726"; position: absolute; top: -3px; right: 0; color: var(--rust); font-size: 12px; }
-.legend-swatch.event-sw { border-color: var(--moss); }
-.legend-swatch.event-sw::before { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--moss); }
-.legend-swatch.wysen-sw { background: var(--parchment-deep); border-color: var(--ochre); }
-.legend-swatch.adv-range-sw { background: #e8d4a8; border-color: var(--ochre); }
-.legend-swatch.adv-end-sw { background: var(--rust); border-color: var(--rust); }
-.legend-swatch.unseason-sw { background: #c8c4bc; border-color: #a8a49c; }
-/* Moon legend swatches */
-.legend-moon-icon {
-  width: 14px; height: 14px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ── Year navigation ── */
-.year-nav {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.year-display {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--ink);
-  min-width: 60px;
-  text-align: center;
-}
-.year-arrow {
-  color: var(--ink-faded);
-  color: var(--ink-faded);
-  background: var(--parchment);
-  border: 1px solid var(--ink-faded);
-  border-radius: 2px;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, color 0.15s;
-}
-.year-arrow:hover {
-  background: var(--ochre);
-  color: var(--parchment-light);
-  border-color: var(--ochre);
-}
-
-/* ── Feast detail panel ── */
-
-
-footer {
-  text-align: center;
-  margin-top: 40px;
-  font-size: 12px;
-  font-style: italic;
-  color: var(--ink-faded);
-  padding: 0 20px;
-  line-height: 1.6;
-}
-
-@media (max-width: 960px) and (min-width: 601px) {
-  .months-wrap { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 600px) {
-  body { padding: 14px 10px 40px; font-size: 16px; }
-  .card { padding: 18px 16px; }
-
-  .months-wrap { grid-template-columns: 1fr; }
-  .selected-date-bar { flex-wrap: wrap; gap: 6px; }
-}
-
-/* Disable sticky hover on touch devices */
-@media (hover: none) {
-  .day-cell,
-  .wysenday-cell {
-    transition: none;
-  }
-  .day-cell:hover,
-  .day-cell.today:hover,
-  .day-cell.unseason:hover,
-  .day-cell.adventure-range:hover,
-  .day-cell.adventure-end:hover,
-  .wysenday-cell:hover,
-  .wysenday-cell.today:hover,
-  .wysenday-cell.unseason:hover,
-  .wysenday-cell.adventure-range:hover,
-  .wysenday-cell.adventure-end:hover {
-    background: unset;
-    border-color: unset;
-  }
-  .day-cell.today:hover         { background: var(--ochre); border-color: var(--ochre); }
-  .day-cell.adventure-end:hover { background: var(--rust);  border-color: var(--rust);  }
-  .wysenday-cell.today:hover    { background: var(--ochre); border-color: var(--ochre); }
-}
-
-
-
-/* ── Search results ── */
-.search-item {
-  padding: 8px 12px;
-  cursor: pointer;
-  border-bottom: 1px solid rgba(107,94,78,0.15);
-  font-family: 'EB Garamond', serif;
-  font-size: 16px;
-  color: var(--ink);
-  transition: background 0.1s;
-}
-.search-item:hover {
-  background: var(--parchment-deep);
-}
-.search-item:last-child { border-bottom: none; }
-.search-item .search-label {
-  font-weight: 600;
-  color: var(--ink);
-}
-.search-item .search-meta {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 12px;
-  color: var(--ink-faded);
-  margin-left: 8px;
+.wysenday-cell.today.unseason {
+  background: var(--black);
+  border-color: var(--black);
 }
 </style>
 </head>
 <body>
-<div class="container">
-<header>
-  <h1>Dolmenwood Calendar</h1>
-  <p class="sub">Tracking days in the Dolmenwood</p>
-</header>
-
-<!-- The "today" card -->
-<div class="today-card-wrap">
-  <div class="card today-card" id="today-card"></div>
-  <button id="capture-btn" class="capture-btn" onclick="captureTodayCard()" title="Capture" data-html2canvas-ignore="true">
-    <svg width="18" height="18" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="12.5" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 6 L9.5 3.5 H12.5 L14 6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="17" cy="9" r="1" fill="currentColor"/></svg>
-  </button>
-</div>
-
-
-<!-- Search feasts & wysendays -->
-<div class="card" id="search-card">
-  <div class="section-title">Search Feasts &amp; Wysendays</div>
-  <div style="position:relative;">
-    <input type="text" id="feast-search" placeholder="e.g. Hanglemas, St Vinicus, Vernal Equinox…" autocomplete="off"
-      style="width:100%; font-family:'EB Garamond',serif; font-size:16px; color:var(--ink); background:var(--parchment); border:1px solid var(--ink-faded); border-radius:2px; padding:10px 12px;">
-    <div id="search-results" style="display:none; position:absolute; left:0; right:0; top:100%; z-index:10; max-height:260px; overflow-y:auto; background:var(--parchment-light); border:1px solid var(--ink-faded); border-top:none; border-radius:0 0 2px 2px; box-shadow:0 4px 12px var(--shadow);"></div>
+<div class="screen">
+  <div class="today-col">
+    <div class="card today-card" id="today-card"></div>
   </div>
+  <div class="month-col" id="month-col"></div>
 </div>
-
-<!-- Adventure Calculator -->
-<div class="card" id="offset-card">
-  <div class="section-title">Adventure Calculator</div>
-  <p style="margin:0 0 14px; font-size:15px; color:var(--ink-soft);">
-    By default this calendar shows the Dolmenwood date corresponding to today's real-world date.
-    Adjust the values below to look forward or backward in time.
-  </p>
-  <form class="offset-row" onsubmit="event.preventDefault(); applyOffset(); return false;">
-    <div class="field">
-      <label>Real-World Adventure Start</label>
-      <input id="real-date" type="date">
-    </div>
-    <div class="field">
-      <label>Dolmenwood Adventure Start</label>
-      <div style="display:flex; gap:6px; align-items:flex-end;">
-        <select id="adv-dw-month" style="font-family:'EB Garamond',serif; font-size:15px; color:var(--ink); background:var(--parchment); border:1px solid var(--ink-faded); border-radius:2px; padding:7px 6px; height:36px;">
-          <option value="1">Grimvold</option>
-          <option value="2">Lymewald</option>
-          <option value="3">Haggryme</option>
-          <option value="4">Symswald</option>
-          <option value="5">Harchment</option>
-          <option value="6">Iggwyld</option>
-          <option value="7">Chysting</option>
-          <option value="8">Lillipythe</option>
-          <option value="9">Haelhold</option>
-          <option value="10">Reedwryme</option>
-          <option value="11">Obthryme</option>
-          <option value="12">Braghold</option>
-        </select>
-        <input id="adv-dw-day" type="number" min="1" max="31" value="1" style="width:56px; font-size:15px; padding:7px 6px; height:36px;">
-        <input id="adv-dw-year" type="number" value="1089" style="width:72px; font-size:15px; padding:7px 6px; height:36px;">
-      </div>
-    </div>
-    <div class="field">
-      <label>Total Days</label>
-      <input id="off-days" type="number" value="0">
-    </div>
-    <div class="field">
-      <label>&nbsp;</label>
-      <button class="go" type="submit">Calculate</button>
-    </div>
-    <div class="field">
-      <label>&nbsp;</label>
-      <button class="link" type="button" onclick="resetToToday()">Reset to today</button>
-    </div>
-  </form>
-</div>
-
-<!-- The full year -->
-<div class="card">
-  <div class="scene-title" style="display:flex; align-items:center; justify-content:space-between;">
-    <span>The Year</span>
-    <div class="year-nav">
-      <button class="go" id="toggle-full-year" onclick="toggleFullYear()" style="font-size:11px; padding:6px 14px; height:auto; margin-right:6px;">Show Full Year</button>
-      <button class="year-arrow" onclick="changeYear(-1)" title="Previous year"><svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="8,2 2,8 8,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <span class="year-display" id="year-display"></span>
-      <button class="year-arrow" onclick="changeYear(1)" title="Next year"><svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="2,2 8,8 2,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    </div>
-  </div>
-  <div class="legend">
-    <div class="legend-item"><span class="legend-swatch feast-sw"></span> Feast or holiday</div>
-    <div class="legend-item"><span class="legend-swatch event-sw"></span> Solstice / equinox</div>
-    <div class="legend-item"><span class="legend-swatch unseason-sw"></span> Unseason</div>
-    <div class="legend-item">
-      <span class="legend-moon-icon">
-        <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#1a1612" stroke="#6b5e4e" stroke-width="0.8"/></svg>
-      </span>
-      New Moon
-    </div>
-    <div class="legend-item">
-      <span class="legend-moon-icon">
-        <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#f9f3e3" stroke="#6b5e4e" stroke-width="0.8"/></svg>
-      </span>
-      Full Moon
-    </div>
-  </div>
-  <div class="months-wrap" id="months-wrap"></div>
-</div>
-
-<!-- Change Calibration Date -->
-<div class="card" id="calibration-card">
-  <div class="section-title">Change Calibration Date</div>
-  <p style="margin:0 0 14px; font-size:15px; color:var(--ink-soft);">
-    Set which real-world date corresponds to which Dolmenwood date. The entire calendar recalculates from this anchor.
-  </p>
-  <div class="offset-row">
-    <div class="field">
-      <label>Real-World Date</label>
-      <input id="cal-real-date" type="date">
-    </div>
-    <div class="field">
-      <label>Dolmenwood Month</label>
-      <select id="cal-dw-month" style="font-family:'EB Garamond',serif; font-size:16px; color:var(--ink); background:var(--parchment); border:1px solid var(--ink-faded); border-radius:2px; padding:8px 10px; height:38px;">
-        <option value="1">Grimvold</option>
-        <option value="2">Lymewald</option>
-        <option value="3">Haggryme</option>
-        <option value="4">Symswald</option>
-        <option value="5">Harchment</option>
-        <option value="6">Iggwyld</option>
-        <option value="7">Chysting</option>
-        <option value="8">Lillipythe</option>
-        <option value="9">Haelhold</option>
-        <option value="10">Reedwryme</option>
-        <option value="11">Obthryme</option>
-        <option value="12">Braghold</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Day</label>
-      <input id="cal-dw-day" type="number" min="1" max="31" value="1" style="width:70px;">
-    </div>
-    <div class="field">
-      <label>Year</label>
-      <input id="cal-dw-year" type="number" value="1089" style="width:90px;">
-    </div>
-    <div class="field">
-      <label>&nbsp;</label>
-      <button class="go" type="button" onclick="applyCalibration()">Set Calibration</button>
-    </div>
-    <div class="field">
-      <label>&nbsp;</label>
-      <button class="link" type="button" onclick="resetCalibration()">Reset to Defaults</button>
-    </div>
-  </div>
-</div>
-
-
-<div style="margin-top:16px; display:flex; align-items:center; gap:8px; justify-content:center; flex-wrap:wrap;">
-  <label style="font-family:'IM Fell English SC',serif; font-size:12px; letter-spacing:0.06em; color:var(--ink-faded);">Weather Seed</label>
-  <input id="weather-seed-input" type="text" autocomplete="off" spellcheck="false"
-    style="font-family:'EB Garamond',serif; font-size:13px; color:var(--ink); background:var(--parchment); border:1px solid var(--ink-faded); border-radius:2px; padding:4px 8px; width:140px; text-align:center;"
-    placeholder="e.g. mygame2024"
-    onblur="applySeed();"
-    onkeydown="if(event.key==='Enter'){ this.blur(); }" />
-  <button onclick="confirmAndReset();" style="font-family:'IM Fell English SC',serif;font-size:12px;letter-spacing:0.06em;color:var(--ink-faded);background:transparent;border:none;cursor:pointer;text-decoration:underline;padding:4px 0;">Randomise</button>
-</div>
-<p class="disclaimer" style="margin-top:6px; text-align:center; font-family:'EB Garamond',serif; font-size:11px; color:var(--ink-faded);">Share your seed with others to give them the same weather.</p>
-
-
-<footer>
-  Built for Dolmenwood by Necrotic Gnome. This tool uses the Campaign Book, Players Book, and the Book of Hours for Dolmenwood created by Hilltown Studio. This tool was developed with the assistance of AI for HTML programming.
-</footer>
-</div>
-
 
 <script>
 'use strict';
@@ -1096,7 +482,6 @@ const FEASTS = {
 
 // ============================================================================
 // MIRACLES — holy spells granted by saints on their feast days
-// Each entry: { spell, prayer, page }
 // ============================================================================
 const MIRACLES = {
   '1:1':   { spell: 'Animal Growth', prayer: 'Mercy of St Vinicus', page: 106},
@@ -1138,35 +523,24 @@ const MIRACLES = {
 // ============================================================================
 // DATE CONVERSION
 // ============================================================================
-// Default anchor: real-world Feb 26 2026 = Dolmenwood 9/7/1089
-const DEFAULT_ANCHOR_REAL = new Date(Date.UTC(2026, 1, 26));
-const DEFAULT_ANCHOR_DW = { year: 1089, month: 9, day: 7 };
-
-// Mutable anchor — user can override via Change Calibration Date
-let anchorReal = new Date(DEFAULT_ANCHOR_REAL.getTime());
-let anchorDwSerial; // set after dwSerial is defined
+// Anchor: real-world Feb 26 2026 = Dolmenwood 9/7/1089
+const ANCHOR_REAL = new Date(Date.UTC(2026, 1, 26));
+const ANCHOR_DW = { year: 1089, month: 9, day: 7 };
 
 function dwSerial(year, month, day) {
   let serial = year * DAYS_PER_YEAR;
-  for (let i = 0; i < month - 1; i++) {
-    serial += MONTHS[i].len;
-  }
+  for (let i = 0; i < month - 1; i++) serial += MONTHS[i].len;
   serial += (day - 1);
   return serial;
 }
-
-const DEFAULT_ANCHOR_DW_SERIAL = dwSerial(DEFAULT_ANCHOR_DW.year, DEFAULT_ANCHOR_DW.month, DEFAULT_ANCHOR_DW.day);
-anchorDwSerial = DEFAULT_ANCHOR_DW_SERIAL;
+const ANCHOR_DW_SERIAL = dwSerial(ANCHOR_DW.year, ANCHOR_DW.month, ANCHOR_DW.day);
 
 function serialToDw(serial) {
   let year = Math.floor(serial / DAYS_PER_YEAR);
   let rem = serial - year * DAYS_PER_YEAR;
   if (rem < 0) { year -= 1; rem += DAYS_PER_YEAR; }
-  let month = 1;
   for (let i = 0; i < MONTHS.length; i++) {
-    if (rem < MONTHS[i].len) {
-      return { year, month: i + 1, day: rem + 1 };
-    }
+    if (rem < MONTHS[i].len) return { year, month: i + 1, day: rem + 1 };
     rem -= MONTHS[i].len;
   }
   return { year, month: 12, day: MONTHS[11].len };
@@ -1179,17 +553,9 @@ function realDayDiff(a, b) {
   return Math.round((aMid - bMid) / MS_PER_DAY);
 }
 
-function realToDw(realDate, offsetDays) {
-  const diff = realDayDiff(realDate, anchorReal);
-  const dwSerialN = anchorDwSerial + diff + (offsetDays || 0);
-  return serialToDw(dwSerialN);
-}
-
-function dwToReal(dw) {
-  const targetSerial = dwSerial(dw.year, dw.month, dw.day);
-  const dayDiff = targetSerial - anchorDwSerial;
-  const realMs = anchorReal.getTime() + dayDiff * 86400000;
-  return new Date(realMs);
+function realToDw(realDate) {
+  const diff = realDayDiff(realDate, ANCHOR_REAL);
+  return serialToDw(ANCHOR_DW_SERIAL + diff);
 }
 
 function weekdayOf(month, day) {
@@ -1203,15 +569,6 @@ function wysendayName(month, day) {
   return m.wysendays[day - 29] || null;
 }
 
-function formatDw(dw, opts) {
-  const m = MONTHS[dw.month - 1];
-  const wy = wysendayName(dw.month, dw.day);
-  if (wy) return `${wy} of ${m.name}, ${dw.year}`;
-  const wkd = weekdayOf(dw.month, dw.day);
-  if (opts && opts.short) return `${dw.day} ${m.name} ${dw.year}`;
-  return `${wkd}, the ${ordinal(dw.day)} of ${m.name}, ${dw.year}`;
-}
-
 function ordinal(n) {
   const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
@@ -1221,12 +578,11 @@ function ordinal(n) {
 // ============================================================================
 // MOON PHASE
 // ============================================================================
-// Lunar cycle = 29 1/3 days (352 / 12). New Moon anchored to Grimvold day 4.
 const LUNAR_CYCLE = 352 / 12; // 29.333...
-const MOON_ANCHOR_DAY_OF_YEAR = 3; // Grimvold day 4 = absolute day index 3 (0-based)
+const MOON_ANCHOR_DAY_OF_YEAR = 3;
 
 // ============================================================================
-// SUNRISE / SUNSET DATA  (indexed 1-12 by month ordinal)
+// SUNRISE / SUNSET DATA
 // ============================================================================
 const SUN_TIMES = {
   1:  { rise: '8:00 AM',  set: '4:00 PM',  daylight: '8 hrs' },
@@ -1245,11 +601,6 @@ const SUN_TIMES = {
 
 // ============================================================================
 // WEATHER TABLES
-// Each entry: { text, I, V, W }  (true = that condition applies)
-// Keyed by 2d6 result (2-12).
-// TODO: getWeatherTable() currently returns the standard seasonal table.
-//       When Hitching/Vague rules are provided, add the day/month trigger
-//       checks at the top of that function before the seasonal fallthrough.
 // ============================================================================
 const WEATHER = {
   winter: {
@@ -1304,7 +655,6 @@ const WEATHER = {
     11: { text: 'Frosty, chill',           I:false, V:false, W:false },
     12: { text: 'Icy, gentle snow',        I:false, V:false, W:true  },
   },
-  // TODO: wire up to specific day/month trigger conditions when rules are provided
   hitching: {
     2:  { text: 'Torrential rain',         I:false, V:true,  W:true  },
     3:  { text: 'Clear, fresh dew',        I:false, V:false, W:true  },
@@ -1318,7 +668,6 @@ const WEATHER = {
     11: { text: 'Gloomy, shadows drip',    I:false, V:false, W:false },
     12: { text: 'Befuddling green fog',    I:false, V:true,  W:false },
   },
-  // TODO: wire up to specific day/month trigger conditions when rules are provided
   vague: {
     2:  { text: 'Hoarfrost, freezing fog', I:false, V:true,  W:false },
     3:  { text: 'Steady snow, icy mist',   I:false, V:true,  W:true  },
@@ -1336,8 +685,7 @@ const WEATHER = {
 
 // ============================================================================
 // SEEDED PRNG — mulberry32
-// All unseason and weather seeds use year * 100000 + unique offset so they
-// never collide with each other or with the weather seed (year * 10000 + ...).
+// Weather seed is fixed for this static display (no reroll UI).
 // ============================================================================
 function mulberry32(seed) {
   return function() {
@@ -1347,13 +695,11 @@ function mulberry32(seed) {
     return ((t ^ t >>> 14) >>> 0) / 4294967296;
   };
 }
+const weatherSalt = parseInt('10C9KRB', 36);
 
 // ============================================================================
 // UNSEASON TRIGGER FUNCTIONS
-// Each uses a unique seed namespace: year * 100000 + fixed offset per event.
 // ============================================================================
-
-// HITCHING
 function isHitching(dw) {
   if (dw.month !== 1 || dw.day > 20) return false;
   const triggerYear = dw.year - 1;
@@ -1410,10 +756,6 @@ function isChame(dw) {
   return false;
 }
 
-
-// Return array of active unseason objects for a given DW date.
-// Each object: { name, nature, effects, weather } where weather = true means
-// the unseason replaces the standard weather table.
 function getActiveUnseasons(dw) {
   const active = [];
   if (isHitching(dw)) {
@@ -1451,22 +793,15 @@ function getActiveUnseasons(dw) {
   return active;
 }
 
-// ============================================================================
-// WEATHER TABLE SELECTION
-// Hitching and Vague override the seasonal table when active.
-// ============================================================================
 function getWeatherTable(dw) {
-  if (isHitching(dw))    return WEATHER.hitching;
-  if (isVague(dw))       return WEATHER.vague;
-  // Standard seasonal fallthrough
-  if (dw.month <= 3)     return WEATHER.winter;
-  if (dw.month <= 6)     return WEATHER.spring;
-  if (dw.month <= 9)     return WEATHER.summer;
+  if (isHitching(dw)) return WEATHER.hitching;
+  if (isVague(dw))    return WEATHER.vague;
+  if (dw.month <= 3)  return WEATHER.winter;
+  if (dw.month <= 6)  return WEATHER.spring;
+  if (dw.month <= 9)  return WEATHER.summer;
   return WEATHER.autumn;
 }
 
-// Roll 2d6 deterministically for a given DW date.
-// Same year+month+day always produces the same result; different years differ.
 function weatherRoll(dw) {
   const seed = (dw.year * 10000 + dw.month * 100 + dw.day) ^ (weatherSalt * 2654435761);
   const rng = mulberry32(seed >>> 0);
@@ -1475,15 +810,11 @@ function weatherRoll(dw) {
   return d1 + d2;
 }
 
-
-// Return the weather entry for a given DW date.
 function getWeather(dw) {
   const table = getWeatherTable(dw);
   const roll  = weatherRoll(dw);
   return table[roll];
 }
-
-
 
 function moonPhaseOf(month, day) {
   let absDay = 0;
@@ -1491,7 +822,7 @@ function moonPhaseOf(month, day) {
   absDay += (day - 1);
   const daysSinceNewMoon = absDay - MOON_ANCHOR_DAY_OF_YEAR;
   const pos = ((daysSinceNewMoon % LUNAR_CYCLE) + LUNAR_CYCLE) % LUNAR_CYCLE;
-  return pos / LUNAR_CYCLE; // 0.0 = new moon, 0.5 = full moon
+  return pos / LUNAR_CYCLE;
 }
 
 function moonName(phase) {
@@ -1505,15 +836,14 @@ function moonName(phase) {
   return 'Waning Crescent';
 }
 
-// Large moon icon for the today card
+// Large moon icon for the today card — black/white only
 function moonIcon(phase) {
-  const r = 7;
-  const cx = 8, cy = 8;
+  const r = 8, cx = 9, cy = 9;
   if (phase < 0.03 || phase > 0.97) {
-    return `<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="${cx}" cy="${cy}" r="${r}" fill="#1a1612" stroke="#6b5e4e"/></svg>`;
+    return `<svg width="18" height="18" viewBox="0 0 18 18"><circle cx="${cx}" cy="${cy}" r="${r}" fill="#000000" stroke="#000000"/></svg>`;
   }
   if (phase > 0.47 && phase < 0.53) {
-    return `<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="${cx}" cy="${cy}" r="${r}" fill="#f9f3e3" stroke="#6b5e4e"/></svg>`;
+    return `<svg width="18" height="18" viewBox="0 0 18 18"><circle cx="${cx}" cy="${cy}" r="${r}" fill="#ffffff" stroke="#000000" stroke-width="2"/></svg>`;
   }
   const isWaxing = phase < 0.5;
   const litFrac = (phase < 0.5) ? phase * 2 : (1 - phase) * 2;
@@ -1521,109 +851,33 @@ function moonIcon(phase) {
   const litSide = isWaxing
     ? 'M ' + (cx) + ' ' + (cy - r) + ' A ' + r + ' ' + r + ' 0 0 1 ' + cx + ' ' + (cy + r) + ' A ' + Math.abs(ellipseRx) + ' ' + r + ' 0 0 ' + (ellipseRx > 0 ? 0 : 1) + ' ' + cx + ' ' + (cy - r) + ' Z'
     : 'M ' + (cx) + ' ' + (cy - r) + ' A ' + r + ' ' + r + ' 0 0 0 ' + cx + ' ' + (cy + r) + ' A ' + Math.abs(ellipseRx) + ' ' + r + ' 0 0 ' + (ellipseRx > 0 ? 1 : 0) + ' ' + cx + ' ' + (cy - r) + ' Z';
-  return `<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="${cx}" cy="${cy}" r="${r}" fill="#1a1612" stroke="#6b5e4e"/><path d="${litSide}" fill="#f9f3e3"/></svg>`;
+  return `<svg width="18" height="18" viewBox="0 0 18 18"><circle cx="${cx}" cy="${cy}" r="${r}" fill="#000000" stroke="#000000"/><path d="${litSide}" fill="#ffffff"/></svg>`;
 }
 
-// Small moon marker for calendar day cells (new/full moon only).
-//
-// Key insight: the official Dolmenwood calendar places the marker on the first
-// full day AFTER the exact new/full moon moment — i.e. ceiling, not nearest.
-// In terms of pos (days elapsed since the last new moon, range [0, LUNAR_CYCLE)):
-//   • New moon:  pos ∈ [0, 1)  — the moon event fell sometime yesterday
-//   • Full moon: posFull ∈ [0, 1)  where posFull = (pos − half-cycle) mod cycle
-// This guarantees exactly one marked day per lunar event.
+// Small moon marker for calendar day cells (new/full moon only)
 function moonMarker(month, day) {
   let absDay = 0;
   for (let i = 0; i < month - 1; i++) absDay += MONTHS[i].len;
   absDay += (day - 1);
   const pos = ((absDay - MOON_ANCHOR_DAY_OF_YEAR) % LUNAR_CYCLE + LUNAR_CYCLE) % LUNAR_CYCLE;
   if (pos < 1.0) {
-    return `<span class="moon-marker moon-new-marker" title="New Moon"><svg width="9" height="9" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.2" fill="#1a1612" stroke="#6b5e4e" stroke-width="0.8"/></svg></span>`;
+    return `<span class="moon-marker"><svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#000000" stroke="#000000"/></svg></span>`;
   }
   const posFull = (pos - LUNAR_CYCLE / 2 + LUNAR_CYCLE) % LUNAR_CYCLE;
   if (posFull < 1.0) {
-    return `<span class="moon-marker moon-full-marker" title="Full Moon"><svg width="9" height="9" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.2" fill="#f9f3e3" stroke="#6b5e4e" stroke-width="0.8"/></svg></span>`;
+    return `<span class="moon-marker"><svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#ffffff" stroke="#000000" stroke-width="1.5"/></svg></span>`;
   }
   return '';
 }
 
-// ============================================================================
-// FEAST LOOKUP
-// ============================================================================
 function feastFor(month, day) {
   return FEASTS[month + ':' + day] || null;
 }
 
 // ============================================================================
-// STATE
+// RENDER: TODAY CARD
 // ============================================================================
-let currentDw = null;       // the year currently shown in the calendar grid
-let pinnedDw = null;         // the actually-selected date — drives the highlight
-let currentRealDate = null;
-let currentOffsetDays = 0;
-let showFullYear = false;
-let adventureRange = null; // { startDw: {year, month, day}, totalDays: number }
-
-// ============================================================================
-// LOCAL STORAGE — persist the current DW date so weather never shifts
-// on reload due to real-world date drift or calibration changes.
-// ============================================================================
-const LS_KEY      = 'dolmenwood_current_dw';
-const LS_SALT_KEY = 'dolmenwood_weather_salt';
-
-// Weather salt — incremented each time the user reshuffles weather.
-// XORed into every day's seed so all weather changes at once.
-// Initialised to a random value on first ever load so each user's
-// baseline weather is unique — rerolls never sync between users.
-let weatherSalt = 0;
-try {
-  const stored = localStorage.getItem(LS_SALT_KEY);
-  if (stored !== null && !isNaN(parseInt(stored, 10))) {
-    weatherSalt = parseInt(stored, 10);
-  } else {
-    // First load — use default seed 10C9KRB
-    weatherSalt = parseInt('10C9KRB', 36);
-    localStorage.setItem(LS_SALT_KEY, weatherSalt);
-  }
-} catch(e) {}
-
-function saveDwToStorage(dw) {
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify({ year: dw.year, month: dw.month, day: dw.day }));
-  } catch(e) {}
-}
-
-function loadDwFromStorage() {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return null;
-    const obj = JSON.parse(raw);
-    if (obj && obj.year && obj.month && obj.day) return obj;
-  } catch(e) {}
-  return null;
-}
-
-function clearDwStorage() {
-  try { localStorage.removeItem(LS_KEY); } catch(e) {}
-}
-
-
-
-// ── Dynamic subheading in header ──────────────────────────────────────────
-function formatDwSubheading(dw) {
-  const m = MONTHS[dw.month - 1];
-  return `${m.season} \u00b7 ${ordinal(m.ord)} Month \u00b7 ${ordinal(dw.day)} Day \u00b7 Year ${dw.year}`;
-}
-
-function updateSubheading(dw) {
-  const el = document.getElementById('date-sub');
-  if (el) el.textContent = formatDwSubheading(dw);
-}
-
-// ============================================================================
-// RENDERING
-// ============================================================================
-function renderTodayCard(dw, realDate, offsetDays) {
+function renderTodayCard(dw, realDate) {
   const m = MONTHS[dw.month - 1];
   const wkd = weekdayOf(dw.month, dw.day);
   const wy = wysendayName(dw.month, dw.day);
@@ -1635,10 +889,8 @@ function renderTodayCard(dw, realDate, offsetDays) {
 
   let html = '';
 
-  // Zone 1: Date — flanked by day-nav arrows (same style as year arrows)
-  html += `<div class="today-date-nav">`;
-  html += `<button class="year-arrow" onclick="changeDay(-1)" title="Previous day" data-html2canvas-ignore="true"><svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="8,2 2,8 8,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
-  html += `<div class="today-date-center">`;
+  // Zone 1: Date
+  html += `<div>`;
   if (wy) {
     html += `<div class="today-weekday">\u2014 Wysenday \u2014</div>`;
   } else {
@@ -1648,10 +900,8 @@ function renderTodayCard(dw, realDate, offsetDays) {
   html += `<div class="today-bigdate">${dayLabel}</div>`;
   html += `<div class="today-season">${ordinal(m.ord)} Month \u00b7 Year ${dw.year}</div>`;
   html += `</div>`;
-  html += `<button class="year-arrow" onclick="changeDay(1)" title="Next day" data-html2canvas-ignore="true"><svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="2,2 8,8 2,14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
-  html += `</div>`;
 
-  // Zone 2: Special day (conditional)
+  // Zone 2: Special day
   if (feast && (feast.feast || feast.event)) {
     html += `<div class="today-special">`;
     if (feast.feast) html += `<div class="today-feasts">\u2726 ${feast.feast}</div>`;
@@ -1660,23 +910,19 @@ function renderTodayCard(dw, realDate, offsetDays) {
     html += `</div>`;
   }
 
-  // Miracle section (conditional — only on feast days with an associated saint miracle)
+  // Miracle (conditional)
   const miracleKey = `${dw.month}:${dw.day}`;
   const miracle = MIRACLES[miracleKey];
   if (miracle) {
     html += `<div class="miracle-card">`;
-    html += `<div class="miracle-spell">${miracle.spell} \u2014 ${miracle.prayer}${miracle.page ? ' <span class="miracle-page">(p. ' + miracle.page + ')</span>' : ''}</span></div>`;
-
+    html += `<div class="miracle-spell">${miracle.spell} \u2014 ${miracle.prayer}${miracle.page ? ' (p. ' + miracle.page + ')' : ''}</div>`;
     html += `</div>`;
   }
 
-  // ── Zone 3: Weather & Unseasons ───────────────────────────────────────────
+  // Zone 3: Weather & Unseasons
   const wx = getWeather(dw);
   html += `<div class="today-weather-zone">`;
-
   if (hasUnseason) {
-    // Unseasons take over this zone
-    html += `<div class="today-unseasons">`;
     for (const u of unseasons) {
       html += `<div class="unseason-block">`;
       html += `<div class="unseason-name">${u.name}</div>`;
@@ -1684,10 +930,7 @@ function renderTodayCard(dw, realDate, offsetDays) {
       html += `<div class="unseason-effects">${u.effects}</div>`;
       html += `</div>`;
     }
-    html += `</div>`;
-    // Weather — same style as standard, no season prefix, separated by a rule
-    html += `<div class="today-weather-zone" style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(107,94,78,0.2);">`;
-    html += `<div class="today-weather">${wx.text}</div>`;
+    html += `<div class="today-weather" style="margin-top:8px;">${wx.text}</div>`;
     const uImpacts = [];
     if (wx.I) uImpacts.push('Travel impeded \u2014 daily Travel Points reduced by 2');
     if (wx.V) uImpacts.push('Poor visibility \u2014 encounter distance halved, +1-in-6 chance of getting lost');
@@ -1697,9 +940,7 @@ function renderTodayCard(dw, realDate, offsetDays) {
       for (const imp of uImpacts) html += `<div class="today-weather-impact">${imp}</div>`;
       html += `</div>`;
     }
-    html += `</div>`;
   } else {
-    // Standard weather
     html += `<div class="today-weather">${m.season} \u00b7 ${wx.text}</div>`;
     const impacts = [];
     if (wx.I) impacts.push('Travel impeded \u2014 daily Travel Points reduced by 2');
@@ -1711,15 +952,14 @@ function renderTodayCard(dw, realDate, offsetDays) {
       html += `</div>`;
     }
   }
-  html += `</div>`; // end weather zone
+  html += `</div>`;
 
-  // ── Zone 4: Reference info ────────────────────────────────────────────────
+  // Zone 4: Reference info
   const sun = SUN_TIMES[dw.month];
-  const sunSvgRise = `<svg width="12" height="12" viewBox="0 0 13 13" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="3" fill="var(--ochre)" stroke="none"/><g stroke="var(--ochre)" stroke-width="1.2" stroke-linecap="round"><line x1="6.5" y1="0.5" x2="6.5" y2="2.2"/><line x1="6.5" y1="10.8" x2="6.5" y2="12.5"/><line x1="0.5" y1="6.5" x2="2.2" y2="6.5"/><line x1="10.8" y1="6.5" x2="12.5" y2="6.5"/><line x1="2.1" y1="2.1" x2="3.3" y2="3.3"/><line x1="9.7" y1="9.7" x2="10.9" y2="10.9"/><line x1="10.9" y1="2.1" x2="9.7" y2="3.3"/><line x1="3.3" y1="9.7" x2="2.1" y2="10.9"/></g></svg>`;
-  const sunSvgSet  = `<svg width="12" height="12" viewBox="0 0 13 13" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="3" fill="var(--rust)" stroke="none" opacity="0.75"/><g stroke="var(--rust)" stroke-width="1.2" stroke-linecap="round" opacity="0.75"><line x1="6.5" y1="0.5" x2="6.5" y2="2.2"/><line x1="6.5" y1="10.8" x2="6.5" y2="12.5"/><line x1="0.5" y1="6.5" x2="2.2" y2="6.5"/><line x1="10.8" y1="6.5" x2="12.5" y2="6.5"/><line x1="2.1" y1="2.1" x2="3.3" y2="3.3"/><line x1="9.7" y1="9.7" x2="10.9" y2="10.9"/><line x1="10.9" y1="2.1" x2="9.7" y2="3.3"/><line x1="3.3" y1="9.7" x2="2.1" y2="10.9"/></g></svg>`;
+  const sunSvgRise = `<svg width="14" height="14" viewBox="0 0 13 13" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="3" fill="#000000" stroke="none"/><g stroke="#000000" stroke-width="1.4" stroke-linecap="round"><line x1="6.5" y1="0.5" x2="6.5" y2="2.2"/><line x1="6.5" y1="10.8" x2="6.5" y2="12.5"/><line x1="0.5" y1="6.5" x2="2.2" y2="6.5"/><line x1="10.8" y1="6.5" x2="12.5" y2="6.5"/><line x1="2.1" y1="2.1" x2="3.3" y2="3.3"/><line x1="9.7" y1="9.7" x2="10.9" y2="10.9"/><line x1="10.9" y1="2.1" x2="9.7" y2="3.3"/><line x1="3.3" y1="9.7" x2="2.1" y2="10.9"/></g></svg>`;
+  const sunSvgSet  = `<svg width="14" height="14" viewBox="0 0 13 13" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="3" fill="#7d7d7d" stroke="none"/><g stroke="#7d7d7d" stroke-width="1.4" stroke-linecap="round"><line x1="6.5" y1="0.5" x2="6.5" y2="2.2"/><line x1="6.5" y1="10.8" x2="6.5" y2="12.5"/><line x1="0.5" y1="6.5" x2="2.2" y2="6.5"/><line x1="10.8" y1="6.5" x2="12.5" y2="6.5"/><line x1="2.1" y1="2.1" x2="3.3" y2="3.3"/><line x1="9.7" y1="9.7" x2="10.9" y2="10.9"/><line x1="10.9" y1="2.1" x2="9.7" y2="3.3"/><line x1="3.3" y1="9.7" x2="2.1" y2="10.9"/></g></svg>`;
 
-  let realLabel = realDate.toUTCString().slice(0, 16).toUpperCase();
-  if (offsetDays) realLabel += ` (+${offsetDays}d)`;
+  const realLabel = realDate.toUTCString().slice(0, 16).toUpperCase();
 
   html += `<div class="today-reference">`;
   html += `<span class="today-ref-item">${realLabel}</span>`;
@@ -1736,658 +976,68 @@ function renderTodayCard(dw, realDate, offsetDays) {
   document.getElementById('today-card').innerHTML = html;
 }
 
-function renderMonthGrid(activeDw) {
-  const out = document.getElementById('months-wrap');
-  const yearEl = document.getElementById('year-display');
-  if (yearEl) yearEl.textContent = activeDw.year;
-  const toggleBtn = document.getElementById('toggle-full-year');
-  if (toggleBtn) toggleBtn.textContent = showFullYear ? 'Show Remaining Year' : 'Show Full Year';
-
-  // Adventure range: compute start & end serials if an adventure span is active.
-  // adventureRange = { startDw, totalDays } where totalDays >= 1 means a span exists.
-  let rangeStartSerial = null;
-  let rangeEndSerial = null;
-  if (adventureRange && adventureRange.totalDays > 0) {
-    rangeStartSerial = dwSerial(adventureRange.startDw.year, adventureRange.startDw.month, adventureRange.startDw.day);
-    rangeEndSerial = rangeStartSerial + adventureRange.totalDays - 1;
-  }
-
-  const monthsToShow = showFullYear ? MONTHS : MONTHS.filter(m => m.ord >= activeDw.month);
+// ============================================================================
+// RENDER: CURRENT MONTH (right column)
+// ============================================================================
+function renderMonthCol(dw) {
+  const out = document.getElementById('month-col');
+  const m = MONTHS[dw.month - 1];
   let html = '';
-  for (const m of monthsToShow) {
-    html += `<div class="month-card">`;
-    html += `<div class="month-name">${m.name}</div>`;
-    html += `<div class="month-meta">${m.season} &middot; ${m.ord}<sup>${m.ord===1?'st':m.ord===2?'nd':m.ord===3?'rd':'th'}</sup> Month</div>`;
+  html += `<div class="month-name">${m.name}</div>`;
+  html += `<div class="month-meta">${m.season} &middot; ${ordinal(m.ord)} Month</div>`;
 
-    html += `<div class="weekday-header">`;
-    for (const w of WEEKDAYS) html += `<div>${w.slice(0, 3).toUpperCase()}</div>`;
-    html += `</div>`;
+  html += `<div class="weekday-header">`;
+  for (const w of WEEKDAYS) html += `<div>${w.slice(0, 3).toUpperCase()}</div>`;
+  html += `</div>`;
 
-    html += `<div class="day-grid">`;
-    for (let day = 1; day <= 28; day++) {
+  html += `<div class="day-grid">`;
+  for (let day = 1; day <= 28; day++) {
+    const f = feastFor(m.ord, day);
+    const isToday = (day === dw.day);
+    const cellDw = { year: dw.year, month: m.ord, day: day };
+    const classes = ['day-cell'];
+    if (getActiveUnseasons(cellDw).length > 0) classes.push('unseason');
+    if (isToday) classes.push('today');
+    if (f && f.feast) classes.push('feast');
+    if (f && f.event) classes.push('event');
+    const marker = moonMarker(m.ord, day);
+    html += `<div class="${classes.join(' ')}">${marker}<div class="num">${day}</div></div>`;
+  }
+  html += `</div>`;
+
+  if (m.len > 28) {
+    html += `<div class="wysenday-row">`;
+    for (let day = 29; day <= m.len; day++) {
+      const wy = wysendayName(m.ord, day);
       const f = feastFor(m.ord, day);
-      const cellSerial = dwSerial(activeDw.year, m.ord, day);
-      const isToday = pinnedDw && (activeDw.year === pinnedDw.year && m.ord === pinnedDw.month && day === pinnedDw.day);
-      const cellDw = { year: activeDw.year, month: m.ord, day: day };
-      const classes = ['day-cell'];
-      // Unseason background — applied first so adventure/today classes override via CSS
+      const isToday = (day === dw.day);
+      const cellDw = { year: dw.year, month: m.ord, day: day };
+      const classes = ['wysenday-cell'];
       if (getActiveUnseasons(cellDw).length > 0) classes.push('unseason');
-      // Apply range classes (start stays as `today`; end gets adventure-end; middle gets adventure-range)
-      if (rangeStartSerial !== null) {
-        if (cellSerial === rangeStartSerial) {
-          classes.push('today');
-        } else if (cellSerial === rangeEndSerial && rangeEndSerial !== rangeStartSerial) {
-          classes.push('adventure-end');
-        } else if (cellSerial > rangeStartSerial && cellSerial < rangeEndSerial) {
-          classes.push('adventure-range');
-        } else if (isToday) {
-          classes.push('today');
-        }
-      } else if (isToday) {
-        classes.push('today');
-      }
-      if (f && f.feast) classes.push('feast');
-      if (f && f.event) classes.push('event');
+      if (isToday) classes.push('today');
+      let extra = '';
+      if (f && f.feast) extra = ' \u2726';
       const marker = moonMarker(m.ord, day);
-      html += `<div class="${classes.join(' ')}" title="${dayTooltip(m.ord, day, f)}" data-month="${m.ord}" data-day="${day}"><div class="num">${day}</div>${marker}</div>`;
-    }
-    html += `</div>`;
-
-    if (m.len > 28) {
-      html += `<div class="wysenday-row">`;
-      for (let day = 29; day <= m.len; day++) {
-        const wy = wysendayName(m.ord, day);
-        const f = feastFor(m.ord, day);
-        const cellSerial = dwSerial(activeDw.year, m.ord, day);
-        const isToday = pinnedDw && (activeDw.year === pinnedDw.year && m.ord === pinnedDw.month && day === pinnedDw.day);
-        const cellDw = { year: activeDw.year, month: m.ord, day: day };
-        const classes = ['wysenday-cell'];
-        // Unseason background — applied first so adventure/today classes override via CSS
-        if (getActiveUnseasons(cellDw).length > 0) classes.push('unseason');
-        if (rangeStartSerial !== null) {
-          if (cellSerial === rangeStartSerial) {
-            classes.push('today');
-          } else if (cellSerial === rangeEndSerial && rangeEndSerial !== rangeStartSerial) {
-            classes.push('adventure-end');
-          } else if (cellSerial > rangeStartSerial && cellSerial < rangeEndSerial) {
-            classes.push('adventure-range');
-          } else if (isToday) {
-            classes.push('today');
-          }
-        } else if (isToday) {
-          classes.push('today');
-        }
-        let extra = '';
-        if (f && f.feast) extra = ' <span style="color:var(--rust);font-size:12px;line-height:1;">\u2726</span>';
-        const marker = moonMarker(m.ord, day);
-        // If this is the last wysenday and the total count is odd, span both columns
-        const wysenCount = m.len - 28;
-        const wysenIndex = day - 29; // 0-based
-        const isLastOdd = (wysenCount % 2 === 1) && (wysenIndex === wysenCount - 1);
-        const style = isLastOdd ? ' style="grid-column: 1 / -1;"' : '';
-        html += `<div class="${classes.join(' ')}" title="${dayTooltip(m.ord, day, f)}" data-month="${m.ord}" data-day="${day}"${style}>${marker}<span class="wysen-num">${day}</span><span class="wysen-name">${wy || ''}${extra}</span></div>`;
-      }
-      html += `</div>`;
+      const wysenCount = m.len - 28;
+      const wysenIndex = day - 29;
+      const isLastOdd = (wysenCount % 2 === 1) && (wysenIndex === wysenCount - 1);
+      const style = isLastOdd ? ' style="grid-column: 1 / -1;"' : '';
+      html += `<div class="${classes.join(' ')}"${style}>${marker}<span class="wysen-num">${day}</span><span class="wysen-name">${wy || ''}${extra}</span></div>`;
     }
     html += `</div>`;
   }
+
   out.innerHTML = html;
-
-  // Strip title tooltips on touch devices to prevent iOS tap-highlight bleed
-  if (window.matchMedia('(hover: none)').matches) {
-    out.querySelectorAll('[title]').forEach(el => el.removeAttribute('title'));
-  }
-
-  // Attach click handlers
-  out.querySelectorAll('.day-cell[data-month], .wysenday-cell[data-month]').forEach(el => {
-    el.addEventListener('click', () => {
-      const month = parseInt(el.getAttribute('data-month'), 10);
-      const day = parseInt(el.getAttribute('data-day'), 10);
-      selectDayFromCalendar(month, day);
-    });
-  });
-}
-
-function dayTooltip(month, day, f) {
-  const wkd = weekdayOf(month, day);
-  const wy = wysendayName(month, day);
-  const phase = moonPhaseOf(month, day);
-  const nm = moonName(phase);
-  let s = wy ? wy : `${wkd} ${day} ${MONTHS[month-1].name}`;
-  if (f) {
-    if (f.feast) s += ' \u2014 ' + f.feast;
-    if (f.event) s += ' \u2014 ' + f.event;
-  }
-  if (nm === 'New Moon' || nm === 'Full Moon') {
-    s += ' \u2726 ' + nm;
-  }
-  return s.replace(/"/g, '&quot;');
 }
 
 // ============================================================================
-// CLICK-A-DAY
+// INIT
 // ============================================================================
-function selectDayFromCalendar(month, day) {
-  const dw = { year: currentDw.year, month: month, day: day };
-  const realDate = dwToReal(dw);
-  const isoStr = realDate.getUTCFullYear() + '-' +
-    String(realDate.getUTCMonth() + 1).padStart(2, '0') + '-' +
-    String(realDate.getUTCDate()).padStart(2, '0');
-  document.getElementById('real-date').value = isoStr;
-  document.getElementById('off-days').value = 0;
-
-  currentDw = dw;
-  currentRealDate = realDate;
-  currentOffsetDays = 0;
-  adventureRange = null;
-  pinnedDw = dw;
-  saveDwToStorage(dw);
-
-  updateSubheading(dw);
-  renderTodayCard(dw, realDate, 0);
-  renderMonthGrid(dw);
-
-  document.getElementById('today-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ============================================================================
-// YEAR NAVIGATION
-// ============================================================================
-function changeYear(delta) {
-  const newYear = currentDw.year + delta;
-  const m = MONTHS[currentDw.month - 1];
-  const day = Math.min(currentDw.day, m.len);
-  const dw = { year: newYear, month: currentDw.month, day: day };
-
-  // Only update the browse year — pinnedDw stays on the real selected date
-  currentDw = dw;
-  adventureRange = null;
-  showFullYear = true;
-
-  renderMonthGrid(dw);
-}
-
-// ============================================================================
-// DAY NAVIGATION
-// ============================================================================
-function changeDay(delta) {
-  const serial = dwSerial(currentDw.year, currentDw.month, currentDw.day) + delta;
-  const dw = serialToDw(serial);
-  const realDate = dwToReal(dw);
-  const isoStr = realDate.getUTCFullYear() + '-' +
-    String(realDate.getUTCMonth() + 1).padStart(2, '0') + '-' +
-    String(realDate.getUTCDate()).padStart(2, '0');
-  document.getElementById('real-date').value = isoStr;
-  document.getElementById('off-days').value = 0;
-
-  currentDw = dw;
-  currentRealDate = realDate;
-  currentOffsetDays = 0;
-  adventureRange = null;
-  pinnedDw = dw;
-  saveDwToStorage(dw);
-
-  updateSubheading(dw);
-  renderTodayCard(dw, realDate, 0);
-  renderMonthGrid(dw);
-}
-
-// ============================================================================
-
-// ============================================================================
-// FULL YEAR TOGGLE
-// ============================================================================
-function toggleFullYear() {
-  showFullYear = !showFullYear;
-  renderMonthGrid(currentDw);
-}
-
-// ============================================================================
-// SEARCH: Feasts & Wysendays
-// ============================================================================
-function buildSearchIndex() {
-  // Build a flat list of all searchable entries: feasts, events, and wysendays
-  const entries = [];
-  // Feasts and events
-  for (const key in FEASTS) {
-    const [monthStr, dayStr] = key.split(':');
-    const month = parseInt(monthStr, 10);
-    const day = parseInt(dayStr, 10);
-    const f = FEASTS[key];
-    if (f.feast) entries.push({ label: f.feast, type: 'feast', month, day });
-    if (f.event) entries.push({ label: f.event, type: 'event', month, day });
-  }
-  // Wysendays
-  for (const m of MONTHS) {
-    for (let i = 0; i < m.wysendays.length; i++) {
-      entries.push({ label: m.wysendays[i], type: 'wysenday', month: m.ord, day: 29 + i });
-    }
-  }
-  return entries;
-}
-
-const SEARCH_INDEX = buildSearchIndex();
-
-function initSearch() {
-  const input = document.getElementById('feast-search');
-  const resultsDiv = document.getElementById('search-results');
-  if (!input || !resultsDiv) return;
-
-  input.addEventListener('input', () => {
-    const query = input.value.trim().toLowerCase();
-    if (query.length < 2) { resultsDiv.style.display = 'none'; return; }
-
-    const matches = SEARCH_INDEX.filter(e => e.label.toLowerCase().includes(query));
-    if (matches.length === 0) {
-      resultsDiv.innerHTML = '<div class="search-item" style="color:var(--ink-faded); cursor:default;">No results found</div>';
-      resultsDiv.style.display = 'block';
-      return;
-    }
-
-    resultsDiv.innerHTML = matches.slice(0, 15).map(e => {
-      const mName = MONTHS[e.month - 1].name;
-      const typeLabel = e.type === 'wysenday' ? 'Wysenday' : e.type === 'event' ? 'Observance' : 'Feast';
-      return `<div class="search-item" data-month="${e.month}" data-day="${e.day}">
-        <span class="search-label">${e.label}</span>
-      <span class="search-meta">${ordinal(e.day)} of ${mName} \u00b7 ${typeLabel}</span>
-      </div>`;
-    }).join('');
-    resultsDiv.style.display = 'block';
-
-    // Attach click handlers to results
-    resultsDiv.querySelectorAll('.search-item[data-month]').forEach(el => {
-      el.addEventListener('click', () => {
-        const month = parseInt(el.getAttribute('data-month'), 10);
-        const day = parseInt(el.getAttribute('data-day'), 10);
-        jumpToNextOccurrence(month, day);
-        resultsDiv.style.display = 'none';
-        input.value = '';
-      });
-    });
-  });
-
-  // Close results when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('#search-card')) {
-      resultsDiv.style.display = 'none';
-    }
-  });
-
-  // Also close on Escape
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { resultsDiv.style.display = 'none'; input.blur(); }
-  });
-}
-
-function jumpToNextOccurrence(month, day) {
-  // Find the next upcoming occurrence of this month/day relative to the current DW date.
-  // If the date is today or later this year, use this year. Otherwise, next year.
-  let year = currentDw.year;
-  const currentSerial = dwSerial(currentDw.year, currentDw.month, currentDw.day);
-  const targetSerialThisYear = dwSerial(year, month, day);
-
-  if (targetSerialThisYear < currentSerial) {
-    year += 1; // Already passed this year, jump to next year
-  }
-
-  const dw = { year: year, month: month, day: day };
-  const realDate = dwToReal(dw);
-
-  const isoStr = realDate.getUTCFullYear() + '-' +
-    String(realDate.getUTCMonth() + 1).padStart(2, '0') + '-' +
-    String(realDate.getUTCDate()).padStart(2, '0');
-  document.getElementById('real-date').value = isoStr;
-  document.getElementById('off-days').value = 0;
-
-  currentDw = dw;
-  currentRealDate = realDate;
-  currentOffsetDays = 0;
-  adventureRange = null;
-  pinnedDw = dw;
-  saveDwToStorage(dw);
-
-  updateSubheading(dw);
-  renderTodayCard(dw, realDate, 0);
-  renderMonthGrid(dw);
-
-  document.getElementById('today-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ============================================================================
-// CALIBRATION
-// ============================================================================
-function applyCalibration() {
-  const realDateStr = document.getElementById('cal-real-date').value;
-  const dwMonth = parseInt(document.getElementById('cal-dw-month').value, 10);
-  const dwDay = parseInt(document.getElementById('cal-dw-day').value, 10);
-  const dwYear = parseInt(document.getElementById('cal-dw-year').value, 10);
-
-  if (!realDateStr || isNaN(dwMonth) || isNaN(dwDay) || isNaN(dwYear)) return;
-
-  // Clamp day to valid range for the selected month
-  const maxDay = MONTHS[dwMonth - 1].len;
-  const clampedDay = Math.max(1, Math.min(dwDay, maxDay));
-  document.getElementById('cal-dw-day').value = clampedDay;
-
-  // Update the mutable anchor
-  const [y, m, d] = realDateStr.split('-').map(Number);
-  anchorReal = new Date(Date.UTC(y, m - 1, d));
-  anchorDwSerial = dwSerial(dwYear, dwMonth, clampedDay);
-
-  // Recalculate everything from the current real-world date in the calculator
-  applyOffset();
-}
-
-function resetCalibration() {
-  // Restore default anchor
-  anchorReal = new Date(DEFAULT_ANCHOR_REAL.getTime());
-  anchorDwSerial = DEFAULT_ANCHOR_DW_SERIAL;
-
-  // Reset weather seed to default
-  weatherSalt = parseInt('10C9KRB', 36);
-  try { localStorage.setItem(LS_SALT_KEY, weatherSalt); } catch(e) {}
-  updateSeedInput();
-
-  // Reset the calibration fields to show current defaults
-  populateCalibrationDefaults();
-
-  // Recalculate (also clears adventure range via resetToToday)
-  adventureRange = null;
-  applyOffset();
-}
-
-function populateCalibrationDefaults() {
-  // Set real-world date to today
-  const today = new Date();
-  document.getElementById('cal-real-date').value = todayIsoString(today);
-
-  // Set DW fields to whatever today currently maps to
-  const dw = realToDw(today, 0);
-  document.getElementById('cal-dw-month').value = dw.month;
-  document.getElementById('cal-dw-day').value = dw.day;
-  document.getElementById('cal-dw-year').value = dw.year;
-
-  // Update day max based on selected month
-  const maxDay = MONTHS[dw.month - 1].len;
-  document.getElementById('cal-dw-day').max = maxDay;
-}
-
-// Update day max when month changes
-function initCalibrationListeners() {
-  const monthSelect = document.getElementById('cal-dw-month');
-  if (monthSelect) {
-    monthSelect.addEventListener('change', () => {
-      const m = parseInt(monthSelect.value, 10);
-      const dayInput = document.getElementById('cal-dw-day');
-      const maxDay = MONTHS[m - 1].len;
-      dayInput.max = maxDay;
-      if (parseInt(dayInput.value, 10) > maxDay) dayInput.value = maxDay;
-    });
-  }
-}
-
-// ============================================================================
-// ADVENTURE CALCULATOR — BIDIRECTIONAL DATE LINKING
-// ============================================================================
-// When the real-world date changes, update the DW adventure start fields.
-// When the DW fields change, update the real-world date.
-// A guard prevents infinite recursion.
-let _syncingAdventure = false;
-
-function syncDwFromReal() {
-  if (_syncingAdventure) return;
-  _syncingAdventure = true;
-  const dateInput = document.getElementById('real-date').value;
-  if (dateInput) {
-    const [y, m, d] = dateInput.split('-').map(Number);
-    const realDate = new Date(Date.UTC(y, m - 1, d));
-    const dw = realToDw(realDate, 0);
-    document.getElementById('adv-dw-month').value = dw.month;
-    document.getElementById('adv-dw-day').value = dw.day;
-    document.getElementById('adv-dw-day').max = MONTHS[dw.month - 1].len;
-    document.getElementById('adv-dw-year').value = dw.year;
-  }
-  _syncingAdventure = false;
-}
-
-function syncRealFromDw() {
-  if (_syncingAdventure) return;
-  _syncingAdventure = true;
-  const month = parseInt(document.getElementById('adv-dw-month').value, 10);
-  let day = parseInt(document.getElementById('adv-dw-day').value, 10);
-  const year = parseInt(document.getElementById('adv-dw-year').value, 10);
-  if (!isNaN(month) && !isNaN(day) && !isNaN(year)) {
-    // Clamp day
-    const maxDay = MONTHS[month - 1].len;
-    document.getElementById('adv-dw-day').max = maxDay;
-    if (day > maxDay) { day = maxDay; document.getElementById('adv-dw-day').value = day; }
-    if (day < 1) { day = 1; document.getElementById('adv-dw-day').value = day; }
-    const dw = { year, month, day };
-    const realDate = dwToReal(dw);
-    const isoStr = realDate.getUTCFullYear() + '-' +
-      String(realDate.getUTCMonth() + 1).padStart(2, '0') + '-' +
-      String(realDate.getUTCDate()).padStart(2, '0');
-    document.getElementById('real-date').value = isoStr;
-  }
-  _syncingAdventure = false;
-}
-
-function initAdventureListeners() {
-  // Real-world date → DW fields
-  const realInput = document.getElementById('real-date');
-  if (realInput) realInput.addEventListener('change', syncDwFromReal);
-
-  // DW fields → Real-world date
-  const dwMonth = document.getElementById('adv-dw-month');
-  const dwDay = document.getElementById('adv-dw-day');
-  const dwYear = document.getElementById('adv-dw-year');
-  if (dwMonth) dwMonth.addEventListener('change', syncRealFromDw);
-  if (dwDay) dwDay.addEventListener('change', syncRealFromDw);
-  if (dwYear) dwYear.addEventListener('change', syncRealFromDw);
-}
-
-// ============================================================================
-// CONTROLLER
-// ============================================================================
-function applyOffset() {
-  const dateInput = document.getElementById('real-date').value;
-  const totalDays = parseInt(document.getElementById('off-days').value, 10) || 0;
-  let realDate;
-  if (dateInput) {
-    const [y, m, d] = dateInput.split('-').map(Number);
-    realDate = new Date(Date.UTC(y, m - 1, d));
-  } else {
-    realDate = new Date();
-  }
-
-  // Start DW date (no offset) — the adventure start.
-  const startDw = realToDw(realDate, 0);
-
-  // Today card shows the start date (Option C — today card is unchanged by totalDays).
-  // The calendar range highlights start through start + totalDays - 1 (inclusive).
-  // totalDays = 0 means no span, just highlight the start day normally.
-  const dw = startDw;
-
-  if (totalDays >= 1) {
-    adventureRange = { startDw, totalDays };
-  } else {
-    adventureRange = null;
-  }
-
-  currentDw = dw;
-  currentRealDate = realDate;
-  currentOffsetDays = totalDays;
-  pinnedDw = dw;
-  saveDwToStorage(dw);
-
-  // Sync the DW adventure start fields to match the start date.
-  _syncingAdventure = true;
-  document.getElementById('adv-dw-month').value = startDw.month;
-  document.getElementById('adv-dw-day').value = startDw.day;
-  document.getElementById('adv-dw-day').max = MONTHS[startDw.month - 1].len;
-  document.getElementById('adv-dw-year').value = startDw.year;
-  _syncingAdventure = false;
-
-  updateSubheading(dw);
-  renderTodayCard(dw, realDate, 0);
-  renderMonthGrid(dw);
-}
-
-function resetToToday() {
-  const today = new Date();
-  document.getElementById('real-date').value = todayIsoString(today);
-  document.getElementById('off-days').value = 0;
-  adventureRange = null;
-  clearDwStorage();
-  applyOffset();
-}
-
-// ============================================================================
-// WEATHER SEED
-// ============================================================================
-
-// Convert any string to a stable 32-bit integer (djb2 hash)
-function strToSalt(str) {
-  if (!str) return (Math.random() * 0xFFFFFFFF) >>> 0;
-  let hash = 5381;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) + hash) + str.charCodeAt(i);
-    hash = hash >>> 0; // keep 32-bit unsigned
-  }
-  return hash;
-}
-
-// Display the current salt as a readable seed string in the input
-function updateSeedInput() {
-  const el = document.getElementById('weather-seed-input');
-  if (el && !el.matches(':focus')) el.value = weatherSalt.toString(36).toUpperCase();
-}
-
-// Apply a user-typed seed
-function applySeed() {
-  const el = document.getElementById('weather-seed-input');
-  const raw = el ? el.value.trim() : '';
-  if (!raw) return;
-  // If the user typed back an exact base-36 salt value, use it directly;
-  // otherwise hash the string so any phrase works as a seed.
-  const asInt = parseInt(raw, 36);
-  weatherSalt = (!isNaN(asInt) && asInt.toString(36).toUpperCase() === raw.toUpperCase())
-    ? (asInt >>> 0)
-    : strToSalt(raw);
-  try { localStorage.setItem(LS_SALT_KEY, weatherSalt); } catch(e) {}
-  updateSeedInput();
-  renderTodayCard(currentDw, currentRealDate, currentOffsetDays);
-  renderMonthGrid(currentDw);
-}
-
-function confirmAndReset() {
-  weatherSalt = (Math.random() * 0xFFFFFFFF) >>> 0;
-  try { localStorage.setItem(LS_SALT_KEY, weatherSalt); } catch(e) {}
-  updateSeedInput();
-  renderTodayCard(currentDw, currentRealDate, currentOffsetDays);
-  renderMonthGrid(currentDw);
-}
-
-
-function todayIsoString(d) {
-  const yy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yy}-${mm}-${dd}`;
-}
-
-// ============================================================================
-// CAPTURE — export today card as PNG
-// ============================================================================
-async function captureTodayCard() {
-  const btn = document.getElementById('capture-btn');
-  if (btn) { btn.style.opacity = '0'; btn.disabled = true; }
-
-  try {
-    const card = document.getElementById('today-card');
-    if (!card) { alert('Nothing to capture.'); return; }
-
-    const scale = Math.min(Math.max(window.devicePixelRatio || 2, 2), 4);
-
-    const raw = await html2canvas(card, {
-      backgroundColor: '#ffffff',
-      scale: scale,
-      useCORS: true,
-      logging: false,
-      ignoreElements: el => el.hasAttribute('data-html2canvas-ignore')
-    });
-
-    // Uniform padding
-    const pad = Math.round(24 * scale);
-    const out = document.createElement('canvas');
-    out.width  = raw.width  + pad * 2;
-    out.height = raw.height + pad * 2;
-    const ctx = out.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, out.width, out.height);
-    ctx.drawImage(raw, pad, pad);
-
-    const dw = currentDw || {};
-    const filename = `dolmenwood_${dw.year || 'date'}_m${dw.month || ''}_d${dw.day || ''}.png`;
-    const link = document.createElement('a');
-    link.download = filename;
-    link.href = out.toDataURL('image/png');
-    link.click();
-  } finally {
-    if (btn) { btn.style.opacity = ''; btn.disabled = false; }
-  }
-}
-
-
-// Init on page load — restore stored DW date if available, else default to today
 window.addEventListener('DOMContentLoaded', () => {
-  populateCalibrationDefaults();
-  initCalibrationListeners();
-  initAdventureListeners();
-  initSearch();
-
-  const stored = loadDwFromStorage();
-  if (stored) {
-    // Restore the stored DW date — weather stays consistent
-    const realDate = dwToReal(stored);
-    const isoStr = realDate.getUTCFullYear() + '-' +
-      String(realDate.getUTCMonth() + 1).padStart(2, '0') + '-' +
-      String(realDate.getUTCDate()).padStart(2, '0');
-    document.getElementById('real-date').value = isoStr;
-    document.getElementById('off-days').value = 0;
-    currentDw = stored;
-    pinnedDw = stored;
-    currentRealDate = realDate;
-    currentOffsetDays = 0;
-    adventureRange = null;
-    _syncingAdventure = true;
-    document.getElementById('adv-dw-month').value = stored.month;
-    document.getElementById('adv-dw-day').value = stored.day;
-    document.getElementById('adv-dw-day').max = MONTHS[stored.month - 1].len;
-    document.getElementById('adv-dw-year').value = stored.year;
-    _syncingAdventure = false;
-    updateSubheading(stored);
-    renderTodayCard(stored, realDate, 0);
-    renderMonthGrid(stored);
-  } else {
-    resetToToday();
-  }
-  document.addEventListener('keydown', (e) => {
-    const tag = document.activeElement ? document.activeElement.tagName : '';
-    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
-    if (e.key === 'ArrowLeft')  { e.preventDefault(); changeDay(-1); }
-    if (e.key === 'ArrowRight') { e.preventDefault(); changeDay(1); }
-  });
-
-  updateSeedInput();
-
-  // Remove title attributes on touch devices — prevents iOS from showing
-  // a tooltip preview highlight on the cell above the one being tapped
-  if (window.matchMedia('(hover: none)').matches) {
-    document.querySelectorAll('.day-cell[title], .wysenday-cell[title]').forEach(el => {
-      el.removeAttribute('title');
-    });
-  }
+  const realDate = new Date();
+  const dw = realToDw(realDate);
+  renderTodayCard(dw, realDate);
+  renderMonthCol(dw);
 });
 </script>
 </body>
