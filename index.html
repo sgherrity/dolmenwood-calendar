@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -2682,10 +2682,29 @@ async function captureTodayCard() {
 
     const dw = currentDw || {};
     const filename = `dolmenwood_${dw.year || 'date'}_m${dw.month || ''}_d${dw.day || ''}.png`;
-    const link = document.createElement('a');
-    link.download = filename;
-    link.href = out.toDataURL('image/png');
-    link.click();
+
+    // Use toBlob + createObjectURL so the link behaves as a real file download
+    // on both desktop and mobile browsers when served over HTTPS.
+    await new Promise((resolve, reject) => {
+      out.toBlob(blob => {
+        if (!blob) { reject(new Error('toBlob failed')); return; }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = url;
+        document.body.appendChild(link); // must be in DOM for HTTPS click to fire
+        link.click();
+        setTimeout(() => {
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          resolve();
+        }, 150);
+      }, 'image/png');
+    });
+
+  } catch (err) {
+    console.error('Capture failed:', err);
+    alert('Capture failed — try long-pressing the card on mobile to save the image.');
   } finally {
     if (btn) { btn.style.opacity = ''; btn.disabled = false; }
   }
