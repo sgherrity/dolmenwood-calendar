@@ -980,7 +980,7 @@ footer {
   Built for Dolmenwood by Necrotic Gnome. This tool uses the Campaign Book, Players Book created by Necrotic Gnome. It also uses "Law, Order, & Dolmenwood: Bringing Courts, Calendars, and Consequences To A Fantasy Setting" created by Warren D and the Book of Hours for Dolmenwood created by Hilltown Studio. This tool was developed with the assistance of AI for HTML programming.
  <p
       >
-        v1.1.0
+        v1.1.1
       </p>
 </footer>
 </div>
@@ -1118,7 +1118,7 @@ const FEASTS = {
   '12:25': { feast: 'Feast of St Thridgold the gallant' },
   '12:28': { feast: 'Feast of St Therese the young' },
   '12:29': { feast: 'Feast of St Habicus the lofty' },
-  '12:30': { feast: 'Feast of St Willofrith the wide', note: "Pluritine Observances: Folk gather in the squares to hear proclaimed any updates to the laws of the Duchy. Afterward, they refresh themselves with mulled wine and cider. The Hunting of the Winter Hart. Folk Observances: It is customary for folk of the Wood to ride out into the woods at night hunting the Winter Hart, which they may do until dawn. If the Hart is caught, folk believe that winter will be banished for a year." },
+  '12:30': { feast: ['Feast of St Willofrith the wide', 'The Hunting of the Winter Hart'], note: "Pluritine Observances: Folk gather in the squares to hear proclaimed any updates to the laws of the Duchy. Afterward, they refresh themselves with mulled wine and cider. Folk Observances: It is customary for folk of the Wood to ride out into the woods at night hunting the Winter Hart, which they may do until dawn. If the Hart is caught, folk believe that winter will be banished for a year." },
 };
 
 // ============================================================================
@@ -1807,7 +1807,10 @@ function renderTodayCard(dw, realDate, offsetDays) {
   // Zone 2: Special day (conditional)
   if (feast && (feast.feast || feast.event)) {
     html += `<div class="today-special">`;
-    if (feast.feast) html += `<div class="today-feasts">\u2726 ${feast.feast}</div>`;
+    if (feast.feast) {
+      const feasts = Array.isArray(feast.feast) ? feast.feast : [feast.feast];
+      for (const f of feasts) html += `<div class="today-feasts">\u2726 ${f}</div>`;
+    }
     if (feast.event) html += `<div class="today-events">\u2609 ${feast.event}</div>`;
     if (feast.note)  html += `<div class="feast-detail">${feast.note.replace(/(Pluritine Observances:.*?)(Folk Observances:)/g, '$1<br>$2')}</div>`;
     html += `</div>`;
@@ -2036,7 +2039,7 @@ function dayTooltip(month, day, f) {
   const nm = moonName(phase);
   let s = wy ? wy : `${wkd} ${day} ${MONTHS[month-1].name}`;
   if (f) {
-    if (f.feast) s += ' \u2014 ' + f.feast;
+    if (f.feast) { const fArr = Array.isArray(f.feast) ? f.feast : [f.feast]; for (const fn of fArr) s += ' \u2014 ' + fn; }
     if (f.event) s += ' \u2014 ' + f.event;
   }
   if (nm === 'New Moon' || nm === 'Full Moon') {
@@ -2135,7 +2138,7 @@ function buildSearchIndex() {
     const month = parseInt(monthStr, 10);
     const day = parseInt(dayStr, 10);
     const f = FEASTS[key];
-    if (f.feast) entries.push({ label: f.feast, type: 'feast', month, day });
+    if (f.feast) { const fArr = Array.isArray(f.feast) ? f.feast : [f.feast]; for (const fn of fArr) entries.push({ label: fn, type: 'feast', month, day }); }
     if (f.event) entries.push({ label: f.event, type: 'event', month, day });
   }
   for (const m of MONTHS) {
@@ -2682,29 +2685,10 @@ async function captureTodayCard() {
 
     const dw = currentDw || {};
     const filename = `dolmenwood_${dw.year || 'date'}_m${dw.month || ''}_d${dw.day || ''}.png`;
-
-    // Use toBlob + createObjectURL so the link behaves as a real file download
-    // on both desktop and mobile browsers when served over HTTPS.
-    await new Promise((resolve, reject) => {
-      out.toBlob(blob => {
-        if (!blob) { reject(new Error('toBlob failed')); return; }
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = filename;
-        link.href = url;
-        document.body.appendChild(link); // must be in DOM for HTTPS click to fire
-        link.click();
-        setTimeout(() => {
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-          resolve();
-        }, 150);
-      }, 'image/png');
-    });
-
-  } catch (err) {
-    console.error('Capture failed:', err);
-    alert('Capture failed — try long-pressing the card on mobile to save the image.');
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = out.toDataURL('image/png');
+    link.click();
   } finally {
     if (btn) { btn.style.opacity = ''; btn.disabled = false; }
   }
