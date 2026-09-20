@@ -980,7 +980,7 @@ footer {
   Built for Dolmenwood by Necrotic Gnome. This tool uses the Campaign Book, Players Book created by Necrotic Gnome. It also uses "Law, Order, & Dolmenwood: Bringing Courts, Calendars, and Consequences To A Fantasy Setting" created by Warren D and the Book of Hours for Dolmenwood created by Hilltown Studio. This tool was developed with the assistance of AI for HTML programming.
  <p
       >
-        v1.1.1
+        v1.1.2
       </p>
 </footer>
 </div>
@@ -2655,6 +2655,54 @@ function todayIsoString(d) {
 // ============================================================================
 // CAPTURE — export today card as PNG
 // ============================================================================
+// Present a captured PNG in an overlay popup — long-press to save on mobile,
+// or tap Download on desktop. Matches Explore_Dolmenwood behavior.
+function showCaptureResult(dataUrl, fileName) {
+  const old = document.getElementById('capture-result');
+  if (old) old.remove();
+  const ov = document.createElement('div');
+  ov.id = 'capture-result';
+  ov.style.cssText =
+    'position:fixed;inset:0;z-index:10010;display:flex;flex-direction:column;' +
+    'align-items:center;justify-content:center;gap:14px;padding:20px;' +
+    'background:rgba(26,22,18,0.72);';
+  ov.addEventListener('click', function(e) { if (e.target === ov) ov.remove(); });
+  const img = document.createElement('img');
+  img.src = dataUrl;
+  img.alt = fileName;
+  img.style.cssText =
+    'max-width:92%;max-height:70vh;border-radius:4px;' +
+    'box-shadow:0 4px 24px rgba(0,0,0,0.5);background:#fff;';
+  const hint = document.createElement('div');
+  hint.textContent = 'Long-press the image to save it, or tap Download.';
+  hint.style.cssText =
+    "color:#e8dcc3;font-family:'EB Garamond',serif;font-size:14px;text-align:center;max-width:92%;";
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:10px;';
+  const dl = document.createElement('a');
+  dl.textContent = 'Download';
+  dl.href = dataUrl;
+  dl.download = fileName;
+  dl.style.cssText =
+    "font-family:'IM Fell English SC',serif;font-size:12px;letter-spacing:0.1em;" +
+    'color:#f9f3e3;background:#3e4f2c;border:none;padding:10px 22px;border-radius:2px;' +
+    'cursor:pointer;text-decoration:none;';
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.textContent = 'Close';
+  close.style.cssText =
+    "font-family:'IM Fell English SC',serif;font-size:12px;letter-spacing:0.1em;" +
+    'color:#e8dcc3;background:transparent;border:1px solid #6b5e4e;padding:10px 22px;' +
+    'border-radius:2px;cursor:pointer;';
+  close.addEventListener('click', function() { ov.remove(); });
+  row.appendChild(dl);
+  row.appendChild(close);
+  ov.appendChild(img);
+  ov.appendChild(hint);
+  ov.appendChild(row);
+  document.body.appendChild(ov);
+}
+
 async function captureTodayCard() {
   const btn = document.getElementById('capture-btn');
   if (btn) { btn.style.opacity = '0'; btn.disabled = true; }
@@ -2685,10 +2733,7 @@ async function captureTodayCard() {
 
     const dw = currentDw || {};
     const filename = `dolmenwood_${dw.year || 'date'}_m${dw.month || ''}_d${dw.day || ''}.png`;
-    const link = document.createElement('a');
-    link.download = filename;
-    link.href = out.toDataURL('image/png');
-    link.click();
+    showCaptureResult(out.toDataURL('image/png'), filename);
   } finally {
     if (btn) { btn.style.opacity = ''; btn.disabled = false; }
   }
