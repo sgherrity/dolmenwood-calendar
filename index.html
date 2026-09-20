@@ -2714,26 +2714,16 @@ async function captureTodayCard() {
     const scale = Math.min(Math.max(window.devicePixelRatio || 2, 2), 4);
 
     const raw = await html2canvas(card, {
-      backgroundColor: '#ffffff',
+      backgroundColor: null,
       scale: scale,
       useCORS: true,
       logging: false,
       ignoreElements: el => el.hasAttribute('data-html2canvas-ignore')
     });
 
-    // Uniform padding
-    const pad = Math.round(24 * scale);
-    const out = document.createElement('canvas');
-    out.width  = raw.width  + pad * 2;
-    out.height = raw.height + pad * 2;
-    const ctx = out.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, out.width, out.height);
-    ctx.drawImage(raw, pad, pad);
-
     const dw = currentDw || {};
     const filename = `dolmenwood_${dw.year || 'date'}_m${dw.month || ''}_d${dw.day || ''}.png`;
-    showCaptureResult(out.toDataURL('image/png'), filename);
+    showCaptureResult(raw.toDataURL('image/png'), filename);
   } finally {
     if (btn) { btn.style.opacity = ''; btn.disabled = false; }
   }
